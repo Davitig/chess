@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chess</title>
+    <link rel="icon" href="assets/images/chess_board.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div id="chess">
+        <div id="opponent" class="captured-peaces">
+            <div class="peaces queens"></div>
+            <div class="peaces bishops"></div>
+            <div class="peaces knights"></div>
+            <div class="peaces rooks"></div>
+            <div class="peaces pawns"></div>
+        </div>
+        <div id="board"></div>
+        <div id="self" class="captured-peaces">
+            <div class="peaces queens"></div>
+            <div class="peaces bishops"></div>
+            <div class="peaces knights"></div>
+            <div class="peaces rooks"></div>
+            <div class="peaces pawns"></div>
+        </div>
+    </div>
+</div>
+<!-- JS -->
+<script src="assets/js/chess.js"></script>
+<script src="assets/js/king.js"></script>
+<script src="assets/js/queen.js"></script>
+<script src="assets/js/bishop.js"></script>
+<script src="assets/js/knight.js"></script>
+<script src="assets/js/rook.js"></script>
+<script src="assets/js/pawn.js"></script>
+<script type="text/javascript">
+    let chess = new Chess('board', 'white');
+
+    chess.createBoard();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+html, body {margin: 0; padding: 0;}
+.clearfix::after {content: ""; clear: both; display: table;}
+.container {width: 720px; margin: 5px auto 20px;}
+.white .square:nth-child(even) {background-color: #deb887;}
+.black .square:nth-child(odd) {background-color: #deb887;}
+.square {float: left; width: 90px; height: 90px; text-align: center;}
+.square[data-available="1"] {cursor: pointer; outline: 1px solid #6da465; outline-offset: -1px;}
+.peace {
+    width: 88px; height:88px; border: 1px solid transparent;
+    background-repeat: no-repeat; background-position:center; background-size: auto 60px; cursor: pointer;
+}
+.peace[data-active="1"] {border-color: #6da465;}
+.peace.w_king {background-image: url('/chess/public/assets/images/w_king.png');}
+.peace.w_queen {background-image: url('/chess/public/assets/images/w_queen.png');}
+.peace.w_bishop {background-image: url('/chess/public/assets/images/w_bishop.png');}
+.peace.w_knight_r {background-image: url('/chess/public/assets/images/w_knight_r.png');}
+.peace.w_knight_l {background-image: url('/chess/public/assets/images/w_knight_l.png');}
+.peace.w_rook {background-image: url('/chess/public/assets/images/w_rook.png');}
+.peace.w_pawn {background-image: url('/chess/public/assets/images/w_pawn.png');}
+.peace.b_king {background-image: url('/chess/public/assets/images/b_king.png');}
+.peace.b_queen {background-image: url('/chess/public/assets/images/b_queen.png');}
+.peace.b_bishop {background-image: url('/chess/public/assets/images/b_bishop.png');}
+.peace.b_knight_r {background-image: url('/chess/public/assets/images/b_knight_r.png');}
+.peace.b_knight_l {background-image: url('/chess/public/assets/images/b_knight_l.png');}
+.peace.b_rook {background-image: url('/chess/public/assets/images/b_rook.png');}
+.peace.b_pawn {background-image: url('/chess/public/assets/images/b_pawn.png');}
+.captured-peaces#opponent {padding-bottom: 5px; text-align: left;}
+.captured-peaces#self {padding-top: 5px; text-align: right;}
+.captured-peaces {width: 100%; height: 30px;}
+.captured-peaces .peaces {display: inline-block;}
+.captured-peaces .peace {width: 30px; height: 30px; display: inline-block; cursor: default; background-size: auto 30px;}

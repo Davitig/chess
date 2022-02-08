@@ -1,0 +1,160 @@
+class Pawn {
+    /**
+     * String representation of the object.
+     *
+     * @type string
+     */
+    name = "pawn"
+
+    // TODO: en passant capturing.
+    // TODO: queen promotion.
+
+    /**
+     * Indicates whether the peace is white or black.
+     *
+     * @type string
+     */
+    side
+
+    /**
+     * The actual white peace file (see assets -> images).
+     *
+     * @type object
+     */
+    white = {
+        file: 'w_pawn'
+    }
+
+    /**
+     * The actual black peace file (see assets -> images).
+     *
+     * @type object
+     */
+    black = {
+        file: 'b_pawn'
+    };
+
+    /**
+     * Create a new pawn.
+     *
+     * @param side string
+     */
+    constructor(side) {
+        this.side = side;
+    }
+
+    /**
+     * Get the peace file.
+     *
+     * @return string
+     */
+    getFile() {
+        return this[this.side].file;
+    }
+
+    /**
+     * Define available squares for the peace.
+     *
+     * @param chess object
+     * @return array
+     */
+    defineMoves(chess) {
+        let alphabet = chess.activeSquareAlphabet;
+        let number = chess.activeSquareNumber;
+
+        let squares = this.getAvailableSquares(alphabet, number);
+
+        let sliceEnd = squares.length;
+
+        squares.forEach((square, index) => {
+            if (chess.squares[square].length !== 0) {
+                sliceEnd = index;
+
+                return false;
+            }
+        });
+
+        squares = squares.slice(0, sliceEnd);
+
+        return squares.concat(this.getCaptureSquares(alphabet + number, chess));
+    }
+
+    /**
+     * Get new movable squares.
+     *
+     * @param alphabet string
+     * @param number integer
+     * @return array
+     */
+    getAvailableSquares(alphabet, number) {
+        let squares = [];
+
+        let newNumber = number;
+
+        if (this.side === "white") {
+            newNumber++;
+        } else {
+            newNumber--;
+        }
+
+        squares.push(alphabet + newNumber);
+
+        if (this.side === "white" && number === 2) {
+            newNumber++;
+            squares.push(alphabet + newNumber);
+        } else if (this.side === "black" && number === 7) {
+            newNumber--
+            squares.push(alphabet + newNumber);
+        }
+
+        if (newNumber > 8 || newNumber < 1) {
+            return [];
+        }
+
+        return squares;
+    }
+
+    /**
+     * Get capture squares.
+     *
+     * @param square string
+     * @param chess object
+     * @return array
+     */
+    getCaptureSquares(square, chess) {
+        let captureSquares = [];
+
+        let alphabet = chess.activeSquareAlphabet;
+
+        let squares = chess.getSquaresArray();
+        let squareKey = chess.getSquaresArrayKey(square, squares);
+
+        if (alphabet !== 'a') {
+            let captureSquare1 = squares[this.side === "white" ? squareKey - 9 : squareKey + 7];
+
+            if (captureSquare1 === undefined) {
+                return [];
+            }
+
+            let peace = chess.squares[captureSquare1];
+            if (peace.length !== 0 && peace.side !== this.side) {
+                captureSquares.push(captureSquare1);
+            }
+        }
+
+        if (alphabet !== 'h') {
+            let captureSquare2 = squares[this.side === "white" ? squareKey - 7 : squareKey + 9];
+
+            if (captureSquare2 === undefined) {
+                return [];
+            }
+
+            let peace = chess.squares[captureSquare2];
+            if (peace.length !== 0 && peace.side !== this.side) {
+                captureSquares.push(captureSquare2);
+            }
+        }
+
+        return captureSquares;
+    }
+}
