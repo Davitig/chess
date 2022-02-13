@@ -126,7 +126,7 @@ class Chess {
             // add the newly created element and its content into the board
             const domElement = document.getElementById(this.domElementName);
             domElement.appendChild(squareElement);
-            domElement.setAttribute('class', this.side ? 'white' : 'black');
+            domElement.setAttribute('class', this.side === 'white' ? 'white' : 'black');
 
             if ((index + 1) % 8 === 0) {
                 domElement.appendChild(document.createElement('br'));
