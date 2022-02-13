@@ -22,7 +22,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
     moveObjects.forEach(moveObject => {
         let newSquareKey = squareKey;
 
-        for (let i = 1; i < 8; i++) {
+        for (let i = 1; i <= distance; i++) {
             newSquareKey = moveObject(newSquareKey);
 
             let targetSquare = squareKeys[newSquareKey];
@@ -86,7 +86,7 @@ const defineLinearSquares = (chess, distance, side) => {
     moveObjects.forEach(moveObject => {
         let newSquareKey = squareKey;
 
-        for (let i = 1; i < 8; i++) {
+        for (let i = 1; i <= distance; i++) {
             newSquareKey = moveObject(newSquareKey);
 
             let targetSquare = squareKeys[newSquareKey];

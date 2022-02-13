@@ -348,6 +348,7 @@ class Chess {
      */
     updateCapturedPeacesElement(peace, peaceElement) {
         const capturedPeacesElement = document.querySelector('#self .' + peace.name + 's');
+
         capturedPeacesElement.appendChild(peaceElement);
     }
 

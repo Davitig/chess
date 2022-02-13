@@ -23,4 +23,26 @@ class Queen extends Peace {
     black = {
         file: 'b_queen'
     }
+
+    /**
+     * Define squares for the peace.
+     *
+     * @param chess object
+     * @return array
+     */
+    defineMoves(chess) {
+        return this.getMovableSquares(chess);
+    }
+
+    /**
+     * Get movable squares.
+     *
+     * @param chess object
+     * @return array
+     */
+    getMovableSquares(chess) {
+        return defineDiagonalSquares(chess, 7, this.side).concat(
+            defineLinearSquares(chess, 7, this.side)
+        );
+    }
 }

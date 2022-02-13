@@ -41,6 +41,6 @@ class Bishop extends Peace {
      * @return array
      */
     getMovableSquares(chess) {
-        return defineDiagonalSquares(chess, 8, this.side);
+        return defineDiagonalSquares(chess, 7, this.side);
     }
 }
