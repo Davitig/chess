@@ -41,6 +41,6 @@ class Rook extends Peace {
      * @return array
      */
     getMovableSquares(chess) {
-        return linearSquares(chess, 8, this.side);
+        return defineLinearSquares(chess, 8, this.side);
     }
 }
