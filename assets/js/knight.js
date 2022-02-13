@@ -1,17 +1,10 @@
-class Knight {
+class Knight extends Peace {
     /**
      * String representation of the object.
      *
      * @type string
      */
     name = "knight"
-
-    /**
-     * Indicates whether the peace is white or black.
-     *
-     * @type string
-     */
-    side;
 
     /**
      * The actual white peace file (see assets -> images).
@@ -35,23 +28,5 @@ class Knight {
             right: 'b_knight_r',
             left: 'b_knight_l'
         }
-    }
-
-    /**
-     * Create a new knight.
-     *
-     * @param side string
-     */
-    constructor(side) {
-        this.side = side;
-    }
-
-    /**
-     * Get the peace file.
-     *
-     * @return object
-     */
-    getFile() {
-        return this[this.side].file;
     }
 }

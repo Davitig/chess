@@ -1,4 +1,4 @@
-class Pawn {
+class Pawn extends Peace {
     /**
      * String representation of the object.
      *
@@ -8,13 +8,6 @@ class Pawn {
 
     // TODO: en passant capturing.
     // TODO: queen promotion.
-
-    /**
-     * Indicates whether the peace is white or black.
-     *
-     * @type string
-     */
-    side
 
     /**
      * The actual white peace file (see assets -> images).
@@ -33,24 +26,6 @@ class Pawn {
     black = {
         file: 'b_pawn'
     };
-
-    /**
-     * Create a new pawn.
-     *
-     * @param side string
-     */
-    constructor(side) {
-        this.side = side;
-    }
-
-    /**
-     * Get the peace file.
-     *
-     * @return string
-     */
-    getFile() {
-        return this[this.side].file;
-    }
 
     /**
      * Define available squares for the peace.

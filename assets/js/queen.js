@@ -1,17 +1,10 @@
-class Queen {
+class Queen extends Peace {
     /**
      * String representation of the object.
      *
      * @type string
      */
     name = "queen"
-
-    /**
-     * Indicates whether the peace is white or black.
-     *
-     * @type string
-     */
-    side;
 
     /**
      * The actual white peace file (see assets -> images).
@@ -29,23 +22,5 @@ class Queen {
      */
     black = {
         file: 'b_queen'
-    }
-
-    /**
-     * Create a new queen.
-     *
-     * @param side string
-     */
-    constructor(side) {
-        this.side = side;
-    }
-
-    /**
-     * Get the peace file.
-     *
-     * @return string
-     */
-    getFile() {
-        return this[this.side].file;
     }
 }
