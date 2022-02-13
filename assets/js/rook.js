@@ -23,4 +23,24 @@ class Rook extends Peace {
     black = {
         file: 'b_rook'
     }
+
+    /**
+     * Define squares for the peace.
+     *
+     * @param chess object
+     * @return array
+     */
+    defineMoves(chess) {
+        return this.getMovableSquares(chess);
+    }
+
+    /**
+     * Get movable squares.
+     *
+     * @param chess object
+     * @return array
+     */
+    getMovableSquares(chess) {
+        return linearSquares(chess, 8, this.side);
+    }
 }

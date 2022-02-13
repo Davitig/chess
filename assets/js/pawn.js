@@ -28,7 +28,7 @@ class Pawn extends Peace {
     };
 
     /**
-     * Define available squares for the peace.
+     * Define squares for the peace.
      *
      * @param chess object
      * @return array
@@ -88,11 +88,11 @@ class Pawn extends Peace {
 
         let alphabet = chess.activeSquareAlphabet;
 
-        let squares = chess.getSquaresArray();
-        let squareKey = chess.getSquaresArrayKey(square, squares);
+        let squareKeys = chess.getSquaresArray();
+        let squareKey = chess.getSquaresArrayKey(square, squareKeys);
 
         if (alphabet !== 'a') {
-            let captureSquare1 = squares[this.side === "white" ? squareKey - 9 : squareKey + 7];
+            let captureSquare1 = squareKeys[this.side === "white" ? squareKey - 9 : squareKey + 7];
 
             if (captureSquare1 === undefined) {
                 return [];
@@ -105,7 +105,7 @@ class Pawn extends Peace {
         }
 
         if (alphabet !== 'h') {
-            let captureSquare2 = squares[this.side === "white" ? squareKey - 7 : squareKey + 9];
+            let captureSquare2 = squareKeys[this.side === "white" ? squareKey - 7 : squareKey + 9];
 
             if (captureSquare2 === undefined) {
                 return [];

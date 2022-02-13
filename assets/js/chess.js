@@ -281,8 +281,8 @@ class Chess {
         }
 
         this.activeSquare = square;
-
-        [this.activeSquareAlphabet, this.activeSquareNumber] = this.splitSquare(square);
+        this.activeSquareAlphabet = this.getSquareAlphabet(square);
+        this.activeSquareNumber = this.getSquareNumber(square);
 
         peaceElement.setAttribute('data-active', 1);
 
@@ -352,18 +352,23 @@ class Chess {
     }
 
     /**
-     * Split square.
+     * Get square alphabet.
      *
      * @param square string
-     * @return array
+     * @return string
      */
-    splitSquare(square) {
-        let squareChars = square.split('');
+    getSquareAlphabet(square) {
+        return square.split('')[0];
+    }
 
-        let alphabet = squareChars[0];
-        let number = parseInt(squareChars[1]);
-
-        return [alphabet, number];
+    /**
+     * Get square number.
+     *
+     * @param square string
+     * @return integer
+     */
+    getSquareNumber(square) {
+        return parseInt(square.split('')[1]);
     }
 
     /**

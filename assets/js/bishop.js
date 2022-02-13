@@ -25,7 +25,7 @@ class Bishop extends Peace {
     }
 
     /**
-     * Define available squares for the peace.
+     * Define squares for the peace.
      *
      * @param chess object
      * @return array
@@ -41,34 +41,6 @@ class Bishop extends Peace {
      * @return array
      */
     getMovableSquares(chess) {
-        let squares = chess.getSquaresArray();
-        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squares);
-
-        let newSquares = [];
-
-        // get west north squares.
-        newSquares = diagonalSquares(squares, squareKey, (squareKey) => {
-            return squareKey - 9;
-        }, 'a');
-        // get north east squares.
-        newSquares = newSquares.concat(
-            diagonalSquares(squares, squareKey, (newSquareKey) => {
-                return newSquareKey - 7;
-            }, 'h')
-        );
-        // get east south squares.
-        newSquares = newSquares.concat(
-            diagonalSquares(squares, squareKey, (newSquareKey) => {
-                return newSquareKey + 9;
-            }, 'a')
-        );
-        // get south west squares.
-        newSquares = newSquares.concat(
-            diagonalSquares(squares, squareKey, (newSquareKey) => {
-                return newSquareKey + 7;
-            }, 'h')
-        );
-
-        return newSquares;
+        return defineDiagonalSquares(chess, 8, this.side);
     }
 }

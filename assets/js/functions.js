@@ -1,72 +1,49 @@
 /**
- * Get diagonal squares.
+ * Define diagonal squares.
  *
- * @param squares array
- * @param squareKey integer
- * @param newSquareKeyFunc closure
+ * @param chess object
+ * @param distance integer
  * @param side string
- * @param edgeAlphabet string
  * @return array
  */
-const diagonalSquares = (squares, squareKey, newSquareKeyFunc, side, edgeAlphabet) => {
+const defineDiagonalSquares = (chess, distance, side) => {
+    let squareKeys = chess.getSquaresArray();
+    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
+    let currentSquare = squareKeys[squareKey];
+
     let newSquares = [];
-    let newSquareKey = squareKey;
+    let moveObjects = [
+        newSquareKey => {return newSquareKey - 7;},
+        newSquareKey => {return newSquareKey - 9;},
+        newSquareKey => {return newSquareKey + 7;},
+        newSquareKey => {return newSquareKey + 9;}
+    ];
 
-    for (let i = 1; i <= 8; i++) {
-        newSquareKey = newSquareKeyFunc(newSquareKey);
-
-        let targetSquare = squares[newSquareKey];
-
-        if (targetSquare !== undefined) {
-            let targetSquarePeace = chess.squares[targetSquare];
-
-            newSquares.push(targetSquare);
-
-            // if object
-            if (targetSquarePeace.length === undefined) {
-                if (targetSquarePeace.side === side) {
-                    newSquares.pop();
-                }
-
-                break;
-            }
-
-            if (chess.splitSquare(targetSquare)[0] === edgeAlphabet) {
-                break;
-            }
-        }
-    }
-
-    return newSquares;
-}
-
-/**
- * Get linear squares.
- *
- * @param squares array
- * @param squareKey integer
- * @param newSquareKeyFunc closure
- * @param side string
- * @param edgeAlphabet string
- * @return array
- */
-const linearSquares = (squares, squareKey, newSquareKeyFunc, side, edgeAlphabet) => {
-        let newSquares = [];
+    moveObjects.forEach(moveObject => {
         let newSquareKey = squareKey;
 
-        for (let i = 1; i <= 8; i++) {
-            newSquareKey = newSquareKeyFunc(newSquareKey);
+        for (let i = 1; i < 8; i++) {
+            newSquareKey = moveObject(newSquareKey);
 
-            let targetSquare = squares[newSquareKey];
+            let targetSquare = squareKeys[newSquareKey];
 
             if (targetSquare !== undefined) {
-                let targetSquarePeace = chess.squares[targetSquare];
+                let currentSquareAlphabet = chess.getSquareAlphabet(currentSquare);
+                let targetSquareAlphabet = chess.getSquareAlphabet(targetSquare);
+
+                if (i === 1
+                    && ['a', 'h'].includes(currentSquareAlphabet)
+                    && ['a', 'h'].includes(targetSquareAlphabet)
+                ) {
+                    break;
+                }
 
                 newSquares.push(targetSquare);
 
-                // if object
+                let targetSquarePeace = chess.squares[targetSquare];
+
+                // if target square contains a peace
                 if (targetSquarePeace.length === undefined) {
-                    console.log(targetSquare);
                     if (targetSquarePeace.side === side) {
                         newSquares.pop();
                     }
@@ -74,11 +51,13 @@ const linearSquares = (squares, squareKey, newSquareKeyFunc, side, edgeAlphabet)
                     break;
                 }
 
-                if (chess.splitSquare(targetSquare)[0] === edgeAlphabet) {
+                // if target square reaches the board edge
+                if (['a', 'h'].includes(targetSquareAlphabet)) {
                     break;
                 }
             }
         }
+    });
 
-        return newSquares;
-    }
+    return newSquares;
+}
