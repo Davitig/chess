@@ -60,36 +60,10 @@ class Pawn {
      */
     defineMoves(chess) {
         let alphabet = chess.activeSquareAlphabet;
-        let number = chess.activeSquareNumber;
+        let number, newNumber;
+        number = newNumber = chess.activeSquareNumber;
 
-        let squares = this.getAvailableSquares(alphabet, number);
-
-        let sliceEnd = squares.length;
-
-        squares.forEach((square, index) => {
-            if (chess.squares[square].length !== 0) {
-                sliceEnd = index;
-
-                return false;
-            }
-        });
-
-        squares = squares.slice(0, sliceEnd);
-
-        return squares.concat(this.getCaptureSquares(alphabet + number, chess));
-    }
-
-    /**
-     * Get new movable squares.
-     *
-     * @param alphabet string
-     * @param number integer
-     * @return array
-     */
-    getAvailableSquares(alphabet, number) {
         let squares = [];
-
-        let newNumber = number;
 
         if (this.side === "white") {
             newNumber++;
@@ -111,7 +85,20 @@ class Pawn {
             return [];
         }
 
-        return squares;
+        let sliceEnd = squares.length;
+
+        squares.forEach((square, index) => {
+            if (chess.squares[square].length !== 0) {
+                sliceEnd = index;
+
+                return false;
+            }
+        });
+
+        // slice occupied squares.
+        squares = squares.slice(0, sliceEnd);
+
+        return squares.concat(this.getCaptureSquares(alphabet + number, chess));
     }
 
     /**
