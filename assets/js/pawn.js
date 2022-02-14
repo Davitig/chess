@@ -6,7 +6,6 @@ class Pawn extends Peace {
      */
     name = "pawn"
 
-    // TODO: en passant capturing.
     // TODO: queen promotion.
 
     /**
@@ -26,6 +25,32 @@ class Pawn extends Peace {
     black = {
         file: 'b_pawn'
     };
+
+    /**
+     * En passant capture square.
+     *
+     * @type string
+     */
+    enPassantSquare;
+
+    /**
+     * Invoke after take square.
+     *
+     * @param chess
+     */
+    afterTakeSquare(chess) {
+        if (this.enPassantSquare) {
+            let enPassantPeace = chess.squares[this.enPassantSquare];
+
+            chess.squares[this.enPassantSquare] = [];
+
+            chess.capturePeaceElement(
+                enPassantPeace, document.querySelector('#' + this.enPassantSquare), false
+            )
+
+            this.enPassantSquare = undefined;
+        }
+    }
 
     /**
      * Define squares for the peace.
@@ -73,19 +98,18 @@ class Pawn extends Peace {
         // slice occupied squares.
         squares = squares.slice(0, sliceEnd);
 
-        return squares.concat(this.getCaptureSquares(alphabet + number, chess));
+        return squares.concat(this.getCaptureSquares(chess));
     }
 
     /**
      * Get capture squares.
      *
-     * @param square string
      * @param chess object
      * @return array
      */
-    getCaptureSquares(square, chess) {
+    getCaptureSquares(chess) {
         let squareKeys = chess.getSquaresArray();
-        let squareKey = chess.getSquaresArrayKey(square, squareKeys);
+        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
         let squares = [];
         let captureSquares = [];
 
@@ -101,9 +125,37 @@ class Pawn extends Peace {
                 if (peace instanceof Peace) {
                     squares.push(captureSquare);
                 }
+
+                let enPassantSquare = this.getEnPassantSquare(chess, captureSquare);
+
+                if (enPassantSquare) {
+                    this.enPassantSquare = enPassantSquare;
+
+                    squares.push(captureSquare);
+                }
             });
         }
 
         return squares;
+    }
+
+    /**
+     * Get en passant capture square.
+     *
+     * @param chess object
+     * @param captureSquare string
+     * @return string|boolean
+     */
+    getEnPassantSquare(chess, captureSquare) {
+        if (! (chess.lastMove.peace instanceof Pawn)
+            || Object.is(this, chess.lastMove.peace)
+            || this.side === chess.lastMove.peace.side
+            || chess.lastMove.prevSquares.length < 2
+            || ! chess.lastMove.prevSquares.includes(captureSquare)
+        ) {
+            return false;
+        }
+
+        return chess.lastMove.activeSquare;
     }
 }

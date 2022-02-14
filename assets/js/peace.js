@@ -23,4 +23,11 @@ class Peace {
     getFile() {
         return this[this.side].file;
     }
+
+    /**
+     * Invoke after take square.
+     *
+     * @param chess
+     */
+    afterTakeSquare(chess) {}
 }

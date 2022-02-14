@@ -5,11 +5,11 @@ html, body {margin: 0; padding: 0;}
 .black .square:nth-child(odd) {background-color: #deb887;}
 .square {float: left; width: 90px; height: 90px; text-align: center;}
 .square[data-available="1"] {cursor: pointer; outline: 1px solid #6da465; outline-offset: -1px;}
+.square[data-active="1"] {outline: 1px solid #6da465; outline-offset: -1px;}
 .peace {
-    width: 88px; height:88px; border: 1px solid transparent;
+    width: 90px; height:90px;
     background-repeat: no-repeat; background-position:center; background-size: auto 60px; cursor: pointer;
 }
-.peace[data-active="1"] {border-color: #6da465;}
 .peace.w_king {background-image: url('../../assets/images/w_king.png');}
 .peace.w_queen {background-image: url('../../assets/images/w_queen.png');}
 .peace.w_bishop {background-image: url('../../assets/images/w_bishop.png');}

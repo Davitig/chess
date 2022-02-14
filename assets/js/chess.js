@@ -86,8 +86,17 @@ class Chess {
     availableSquares = [];
 
     /**
+     * Last move.
+     *
+     * @type object
+     */
+    lastMove = {
+        peace: undefined, square: undefined, prevSquares: []
+    }
+
+    /**
      * Peace looks.
-     * By default every peace looks right (except knight that will change at runtime).
+     * By default every peace looks right, except knight.
      *
      * @type string
      */
@@ -183,7 +192,7 @@ class Chess {
             const element = e.target;
 
             if (element.hasAttribute('data-peace')) {
-                this.onPeaceClick(element);
+                this.onPeaceClick(element.parentNode);
             } else if (element.getAttribute('data-available') === '1') {
                 this.onAvailableSquareClick(element);
             } else {
@@ -195,18 +204,18 @@ class Chess {
     /**
      * On peace click.
      *
-     * @param peaceElement object
+     * @param squareElement object
      */
-    onPeaceClick(peaceElement) {
-        if (peaceElement.parentNode.getAttribute('data-available') === '1') {
-            this.onAvailableSquareClick(peaceElement.parentNode);
+    onPeaceClick(squareElement) {
+        if (squareElement.getAttribute('data-available') === '1') {
+            this.onAvailableSquareClick(squareElement);
 
             return false;
         }
 
-        let square = peaceElement.parentNode.getAttribute('data-square');
+        let square = squareElement.getAttribute('data-square');
 
-        if (this.setActiveSquare(square, peaceElement)) {
+        if (this.setActiveSquare(square, squareElement)) {
             this.setAvailableSquares(square);
         }
     }
@@ -220,54 +229,43 @@ class Chess {
         let targetSquare = targetSquareElement.getAttribute('data-square');
 
         if (this.activeSquare !== undefined && this.availableSquares.includes(targetSquare)) {
-            this.move(this.activeSquare, targetSquare, targetSquareElement);
+            this.takeSquare(targetSquare, targetSquareElement);
         }
 
         this.unsetSquares();
     }
 
     /**
-     * Unset squares.
+     * Take the square.
      *
-     * @param element object
-     */
-    unsetSquares(element) {
-        this.unsetActiveSquare();
-        this.unsetAvailableSquares();
-    }
-
-    /**
-     * Move the peace.
-     *
-     * @param activeSquare string
      * @param targetSquare string
-     * @param targetSquareElement object
+     * @param targetSquareElement object|undefined
+     * @return boolean
      */
-    move(activeSquare, targetSquare, targetSquareElement) {
-        let activePeace = this.squares[activeSquare];
+    takeSquare(targetSquare, targetSquareElement) {
+        let activePeace = this.squares[this.activeSquare];
         let targetPeace = this.squares[targetSquare];
 
-        this.squares[activeSquare] = [];
+        this.squares[this.activeSquare] = [];
         this.squares[targetSquare] = activePeace;
 
-        const activePeaceElement = document.querySelector('#' + activeSquare + ' .peace');
-        const targetPeaceElement = targetSquareElement.querySelector('.peace');
+        activePeace.afterTakeSquare(this);
 
-        if (targetPeaceElement) {
-            this.updateCapturedPeacesElement(targetPeace, targetPeaceElement);
-        }
+        this.setLastMove(activePeace, this.activeSquare, targetSquare);
 
-        targetSquareElement.appendChild(activePeaceElement);
+        this.capturePeaceElement(targetPeace, targetSquareElement)
+
+        return true;
     }
 
     /**
      * Set active square.
      *
-     * @param peaceElement object
      * @param square string
+     * @param squareElement object
      * @return boolean
      */
-    setActiveSquare(square, peaceElement) {
+    setActiveSquare(square, squareElement) {
         // if peace switch
         if (this.activeSquare && this.activeSquare !== square) {
             this.unsetActiveSquare();
@@ -284,7 +282,7 @@ class Chess {
         this.activeSquareAlphabet = this.getSquareAlphabet(square);
         this.activeSquareNumber = this.getSquareNumber(square);
 
-        peaceElement.setAttribute('data-active', 1);
+        squareElement.setAttribute('data-active', 1);
 
         return true;
     }
@@ -319,6 +317,34 @@ class Chess {
     }
 
     /**
+     * Set last move.
+     *
+     * @param activePeace object
+     * @param activeSquare string
+     * @param targetSquare string
+     */
+    setLastMove(activePeace, activeSquare, targetSquare) {
+        this.lastMove.peace = activePeace;
+        this.lastMove.activeSquare = targetSquare;
+
+        let prevSquares = this.availableSquares;
+        prevSquares.pop();
+        prevSquares.push(activeSquare)
+
+        this.lastMove.prevSquares = prevSquares;
+    }
+
+    /**
+     * Unset squares.
+     *
+     * @param element object
+     */
+    unsetSquares(element) {
+        this.unsetActiveSquare();
+        this.unsetAvailableSquares();
+    }
+
+    /**
      * Unset active square.
      */
     unsetActiveSquare() {
@@ -341,19 +367,39 @@ class Chess {
     }
 
     /**
-     * Update captured peaces element.
+     * Capture the peace element with an active one.
      *
-     * @param peace object
+     * @param targetPeace object
+     * @param targetSquareElement object
+     * @param replaceWithActive boolean
+     */
+    capturePeaceElement(targetPeace, targetSquareElement, replaceWithActive = true) {
+        const targetPeaceElement = targetSquareElement.querySelector('.peace');
+
+        if (targetPeace instanceof Peace && targetPeaceElement) {
+            this.collectCapturedPeaceElement(targetPeace.name, targetPeaceElement);
+        }
+
+        if (replaceWithActive) {
+            const activePeaceElement = document.querySelector('#' + this.activeSquare + ' .peace');
+            targetSquareElement.appendChild(activePeaceElement);
+        }
+    }
+
+    /**
+     * Collect the captured peace element.
+     *
+     * @param peaceName string
      * @param peaceElement object
      */
-    updateCapturedPeacesElement(peace, peaceElement) {
-        const capturedPeacesElement = document.querySelector('#self .' + peace.name + 's');
+    collectCapturedPeaceElement(peaceName, peaceElement) {
+        const capturedPeacesElement = document.querySelector('#self .' + peaceName + 's');
 
         capturedPeacesElement.appendChild(peaceElement);
     }
 
     /**
-     * Get square alphabet.
+     * Get alphabet from square.
      *
      * @param square string
      * @return string
@@ -363,7 +409,7 @@ class Chess {
     }
 
     /**
-     * Get square number.
+     * Get number from square.
      *
      * @param square string
      * @return integer
