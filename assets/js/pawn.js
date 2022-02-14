@@ -63,7 +63,7 @@ class Pawn extends Peace {
         let sliceEnd = squares.length;
 
         squares.forEach((square, index) => {
-            if (chess.squares[square].length !== 0) {
+            if (chess.squares[square] instanceof Peace) {
                 sliceEnd = index;
 
                 return false;
@@ -84,39 +84,26 @@ class Pawn extends Peace {
      * @return array
      */
     getCaptureSquares(square, chess) {
-        let captureSquares = [];
-
-        let alphabet = chess.activeSquareAlphabet;
-
         let squareKeys = chess.getSquaresArray();
         let squareKey = chess.getSquaresArrayKey(square, squareKeys);
+        let squares = [];
+        let captureSquares = [];
 
-        if (alphabet !== 'a') {
-            let captureSquare1 = squareKeys[this.side === "white" ? squareKey - 9 : squareKey + 7];
+        let currentSquareAlphabet = chess.activeSquareAlphabet;
 
-            if (captureSquare1 === undefined) {
-                return [];
-            }
+        if (currentSquareAlphabet !== 'a' && currentSquareAlphabet !== 'h') {
+            captureSquares.push(squareKeys[this.side === "white" ? squareKey - 9 : squareKey + 7]);
+            captureSquares.push(squareKeys[this.side === "white" ? squareKey - 7 : squareKey + 9]);
 
-            let peace = chess.squares[captureSquare1];
-            if (peace.length !== 0 && peace.side !== this.side) {
-                captureSquares.push(captureSquare1);
-            }
+            captureSquares.forEach(captureSquare => {
+                let peace = chess.squares[captureSquare];
+
+                if (peace instanceof Peace) {
+                    squares.push(captureSquare);
+                }
+            });
         }
 
-        if (alphabet !== 'h') {
-            let captureSquare2 = squareKeys[this.side === "white" ? squareKey - 7 : squareKey + 9];
-
-            if (captureSquare2 === undefined) {
-                return [];
-            }
-
-            let peace = chess.squares[captureSquare2];
-            if (peace.length !== 0 && peace.side !== this.side) {
-                captureSquares.push(captureSquare2);
-            }
-        }
-
-        return captureSquares;
+        return squares;
     }
 }

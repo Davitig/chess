@@ -43,7 +43,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
                 let targetSquarePeace = chess.squares[targetSquare];
 
                 // if target square contains a peace
-                if (targetSquarePeace.length === undefined) {
+                if (targetSquarePeace instanceof Peace) {
                     if (targetSquarePeace.side === side) {
                         newSquares.pop();
                     }
@@ -110,7 +110,7 @@ const defineLinearSquares = (chess, distance, side) => {
                 let targetSquarePeace = chess.squares[targetSquare];
 
                 // if target square contains a peace
-                if (targetSquarePeace.length === undefined) {
+                if (targetSquarePeace instanceof Peace) {
                     if (targetSquarePeace.side === side) {
                         newSquares.pop();
                     }

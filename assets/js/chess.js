@@ -146,7 +146,7 @@ class Chess {
     addPeace(peace, squareElement) {
         let square = squareElement.getAttribute('data-square');
 
-        if (peace.length === 0 || ! square) {
+        if (! (peace instanceof Peace) || ! square) {
             return false;
         }
 
