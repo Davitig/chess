@@ -6,8 +6,6 @@ class Pawn extends Peace {
      */
     name = "pawn"
 
-    // TODO: queen promotion.
-
     /**
      * The actual white peace file (see assets -> images).
      *
@@ -27,29 +25,103 @@ class Pawn extends Peace {
     };
 
     /**
-     * En passant capture square.
+     * En passant pawn peace.
      *
-     * @type string
+     * @type {object, string, string}
      */
-    enPassantSquare;
+    enPassant = {pawn: undefined, activeSquare: undefined, captureSquare: undefined};
 
     /**
-     * Invoke after take square.
+     * Invoke on take square.
      *
-     * @param chess
+     * @param chess object
+     * @param targetSquare string
      */
-    afterTakeSquare(chess) {
-        if (this.enPassantSquare) {
-            let enPassantPeace = chess.squares[this.enPassantSquare];
-
-            chess.squares[this.enPassantSquare] = [];
-
-            chess.capturePeaceElement(
-                enPassantPeace, document.querySelector('#' + this.enPassantSquare), false
-            )
-
-            this.enPassantSquare = undefined;
+    onTakeSquare(chess, targetSquare) {
+        if (! this.takeEnPassantPeace(chess, targetSquare)) {
+            this.setEnPassantPeace(chess, targetSquare);
         }
+    }
+
+    /**
+     * Take en passant peace.
+     *
+     * @param chess object
+     * @param targetSquare string
+     */
+    takeEnPassantPeace(chess, targetSquare) {
+        if (! (this.enPassant.pawn instanceof Pawn)
+            || chess.getSquareAlphabet(this.enPassant.activeSquare) !== chess.getSquareAlphabet(targetSquare)
+        ) {
+            return false;
+        }
+
+        chess.squares[this.enPassant.activeSquare] = [];
+
+        chess.capturePeaceElement(
+            this.enPassant.pawn,
+            document.querySelector('#' + this.enPassant.activeSquare),
+            false
+        )
+
+        this.enPassant = {};
+
+        return true;
+    }
+
+    /**
+     * Set self as en passant for another same peace.
+     *
+     * @param chess object
+     * @param targetSquare string
+     */
+    setEnPassantPeace(chess, targetSquare) {
+        let targetSquareNumber = chess.getSquareNumber(targetSquare);
+
+        if (! ([4, 5].includes(targetSquareNumber))
+            || chess.availableSquares.length < 2
+        ) {
+            return false;
+        }
+
+        let squares = [];
+        squares = chess.availableSquares.concat(squares);
+
+        let targetSquareKey = chess.getSquaresArrayKey(targetSquare);
+
+        let sideSquare1 = chess.getSquare(
+            this.side === "white" ? targetSquareKey - 1 : targetSquareKey + 1
+        );
+        let sideSquare2 = chess.getSquare(
+            this.side === "white" ? targetSquareKey + 1 : targetSquareKey - 1
+        );
+
+        if (chess.getSquareNumber(sideSquare1) === targetSquareNumber) {
+            squares.push(sideSquare1);
+        }
+
+        if (chess.getSquareNumber(sideSquare2) === targetSquareNumber) {
+            squares.push(sideSquare2);
+        }
+
+        let captureSquare = chess.activeSquare;
+
+        squares.forEach(square => {
+            let peace = chess.squares[square];
+
+            // set self as en passant for another same peace.
+            if (peace instanceof Pawn && ! Object.is(this, peace)) {
+                if (targetSquareNumber === chess.getSquareNumber(square)) {
+                    captureSquare = chess.availableSquares[0];
+                }
+
+                peace.enPassant.pawn = this;
+                peace.enPassant.activeSquare = targetSquare;
+                peace.enPassant.captureSquare = captureSquare;
+            }
+        });
+
+        return true;
     }
 
     /**
@@ -108,54 +180,64 @@ class Pawn extends Peace {
      * @return array
      */
     getCaptureSquares(chess) {
-        let squareKeys = chess.getSquaresArray();
-        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
         let squares = [];
-        let captureSquares = [];
 
-        let currentSquareAlphabet = chess.activeSquareAlphabet;
+        let squareNames = chess.getSquares();
+        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareNames);
 
-        if (currentSquareAlphabet !== 'a' && currentSquareAlphabet !== 'h') {
-            captureSquares.push(squareKeys[this.side === "white" ? squareKey - 9 : squareKey + 7]);
-            captureSquares.push(squareKeys[this.side === "white" ? squareKey - 7 : squareKey + 9]);
+        let captureSquareNumber = chess.activeSquareNumber;
 
-            captureSquares.forEach(captureSquare => {
-                let peace = chess.squares[captureSquare];
+        if (this.side === "white") {
+            captureSquareNumber++;
+        } else {
+            captureSquareNumber--;
+        }
 
-                if (peace instanceof Peace) {
-                    squares.push(captureSquare);
-                }
+        let boardIsWhite = chess.side === "white";
 
-                let enPassantSquare = this.getEnPassantSquare(chess, captureSquare);
+        let squareKey1, squareKey2;
 
-                if (enPassantSquare) {
-                    this.enPassantSquare = enPassantSquare;
+        if (this.side === "white") {
+            squareKey1 = this.getNewKey(! boardIsWhite, squareKey, 7);
+            squareKey2 = this.getNewKey(! boardIsWhite, squareKey, 9);
+        } else {
+            squareKey1 = this.getNewKey(boardIsWhite, squareKey, 7);
+            squareKey2 = this.getNewKey(boardIsWhite, squareKey, 9);
+        }
 
-                    squares.push(captureSquare);
-                }
-            });
+        let captureSquare1 = squareNames[squareKey1];
+        let captureSquare2 = squareNames[squareKey2];
+
+        if (chess.getSquareNumber(captureSquare1) === captureSquareNumber) {
+            squares.push(captureSquare1);
+        }
+
+        if (chess.getSquareNumber(captureSquare2) === captureSquareNumber) {
+            squares.push(captureSquare2);
+        }
+
+        squares = squares.filter(captureSquare => {
+            let peace = chess.squares[captureSquare];
+
+            return peace instanceof Peace && this.side !== peace.side;
+        });
+
+        if (this.enPassant.captureSquare) {
+            squares.push(this.enPassant.captureSquare);
         }
 
         return squares;
     }
 
     /**
-     * Get en passant capture square.
+     * Get a new key.
      *
-     * @param chess object
-     * @param captureSquare string
-     * @return string|boolean
+     * @param isIncrement boolean
+     * @param number integer
+     * @param key integer
+     * @return integer
      */
-    getEnPassantSquare(chess, captureSquare) {
-        if (! (chess.lastMove.peace instanceof Pawn)
-            || Object.is(this, chess.lastMove.peace)
-            || this.side === chess.lastMove.peace.side
-            || chess.lastMove.prevSquares.length < 2
-            || ! chess.lastMove.prevSquares.includes(captureSquare)
-        ) {
-            return false;
-        }
-
-        return chess.lastMove.activeSquare;
+    getNewKey(isIncrement, key, number) {
+        return isIncrement ? key + number : key - number;
     }
 }

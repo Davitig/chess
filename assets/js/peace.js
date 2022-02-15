@@ -25,9 +25,10 @@ class Peace {
     }
 
     /**
-     * Invoke after take square.
+     * Invoke on take square.
      *
-     * @param chess
+     * @param chess object
+     * @param targetSquare string
      */
-    afterTakeSquare(chess) {}
+    onTakeSquare(chess, targetSquare) {}
 }

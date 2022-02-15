@@ -7,7 +7,7 @@ class Chess {
     domElementName;
 
     /**
-     * List of all squares with its predefined peaces.
+     * List of squares with its predefined peaces.
      *
      * @type object
      */
@@ -51,6 +51,13 @@ class Chess {
     };
 
     /**
+     * List of square names.
+     *
+     * @type object
+     */
+    squareNames = [];
+
+    /**
      * Indicates whether you play as a white or black.
      *
      * @type string
@@ -86,15 +93,6 @@ class Chess {
     availableSquares = [];
 
     /**
-     * Last move.
-     *
-     * @type object
-     */
-    lastMove = {
-        peace: undefined, square: undefined, prevSquares: []
-    }
-
-    /**
      * Peace looks.
      * By default every peace looks right, except knight.
      *
@@ -111,20 +109,49 @@ class Chess {
     constructor(name, side) {
         this.domElementName = name;
 
+        this.squareNames = Object.keys(this.squares);
+
         this.side = side;
+    }
+
+    /**
+     * Get the squares.
+     *
+     * @return array
+     */
+    getSquares() {
+        return this.squareNames;
+    }
+
+    /**
+     * Get the square.
+     *
+     * @param key string
+     * @return array
+     */
+    getSquare(key) {
+        return this.squareNames[key];
+    }
+
+    /**
+     * Get a peace from the square.
+     *
+     * @param square string
+     * @return array
+     */
+    getPeace(square) {
+        return this.squares[square];
     }
 
     /**
      * Create a new chess board.
      */
     createBoard() {
-        let squares = this.getSquaresArray();
-
         if (this.side === 'black') {
-            squares.reverse();
+            this.squareNames.reverse();
         }
 
-        squares.forEach((square, index) => {
+        this.squareNames.forEach((square, index) => {
             const squareElement = document.createElement('div');
             squareElement.setAttribute('id', square);
             squareElement.setAttribute('data-square', square);
@@ -249,9 +276,7 @@ class Chess {
         this.squares[this.activeSquare] = [];
         this.squares[targetSquare] = activePeace;
 
-        activePeace.afterTakeSquare(this);
-
-        this.setLastMove(activePeace, this.activeSquare, targetSquare);
+        activePeace.onTakeSquare(this, targetSquare);
 
         this.capturePeaceElement(targetPeace, targetSquareElement)
 
@@ -314,24 +339,6 @@ class Chess {
         });
 
         return true;
-    }
-
-    /**
-     * Set last move.
-     *
-     * @param activePeace object
-     * @param activeSquare string
-     * @param targetSquare string
-     */
-    setLastMove(activePeace, activeSquare, targetSquare) {
-        this.lastMove.peace = activePeace;
-        this.lastMove.activeSquare = targetSquare;
-
-        let prevSquares = this.availableSquares;
-        prevSquares.pop();
-        prevSquares.push(activeSquare)
-
-        this.lastMove.prevSquares = prevSquares;
     }
 
     /**
@@ -405,7 +412,11 @@ class Chess {
      * @return string
      */
     getSquareAlphabet(square) {
-        return square.split('')[0];
+        if (square !== undefined) {
+            return square.split('')[0];
+        }
+
+        return this.activeSquareAlphabet;
     }
 
     /**
@@ -415,27 +426,22 @@ class Chess {
      * @return integer
      */
     getSquareNumber(square) {
-        return parseInt(square.split('')[1]);
+        if (square !== undefined) {
+            return parseInt(square.split('')[1]);
+        }
+
+        return this.activeSquareNumber;
     }
 
     /**
-     * Get squares array.
-     *
-     * @return array
-     */
-    getSquaresArray() {
-        return Object.keys(this.squares);
-    }
-
-    /**
-     * Get squares array key.
+     * Get array key from the squares.
      *
      * @param square string
      * @param squares array|undefined
      * @return boolean|number
      */
     getSquaresArrayKey(square, squares = undefined) {
-        let array = ((squares === undefined) ? this.getSquaresArray() : squares);
+        let array = ((squares === undefined) ? this.getSquares() : squares);
 
         for (let i = 0; i < array.length; i++) {
             if (array[i] === square) {

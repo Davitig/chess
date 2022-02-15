@@ -7,9 +7,9 @@
  * @return array
  */
 const defineDiagonalSquares = (chess, distance, side) => {
-    let squareKeys = chess.getSquaresArray();
-    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
-    let currentSquareAlphabet = chess.getSquareAlphabet(squareKeys[squareKey]);
+    let squares = chess.getSquares();
+    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squares);
+    let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
     let moveObjects = [
@@ -25,7 +25,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
         for (let i = 1; i <= distance; i++) {
             newSquareKey = moveObject(newSquareKey);
 
-            let targetSquare = squareKeys[newSquareKey];
+            let targetSquare = squares[newSquareKey];
 
             if (targetSquare !== undefined) {
                 let targetSquareAlphabet = chess.getSquareAlphabet(targetSquare);
@@ -71,9 +71,9 @@ const defineDiagonalSquares = (chess, distance, side) => {
  * @return array
  */
 const defineLinearSquares = (chess, distance, side) => {
-    let squareKeys = chess.getSquaresArray();
-    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
-    let currentSquareAlphabet = chess.getSquareAlphabet(squareKeys[squareKey]);
+    let squares = chess.getSquares();
+    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squares);
+    let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
     let moveObjects = [
@@ -89,7 +89,7 @@ const defineLinearSquares = (chess, distance, side) => {
         for (let i = 1; i <= distance; i++) {
             newSquareKey = moveObject(newSquareKey);
 
-            let targetSquare = squareKeys[newSquareKey];
+            let targetSquare = squares[newSquareKey];
 
             if (targetSquare !== undefined) {
                 let targetSquareAlphabet = chess.getSquareAlphabet(targetSquare);
