@@ -55,7 +55,7 @@ class Chess {
      *
      * @type object
      */
-    squareNames = [];
+    squareKeys = [];
 
     /**
      * Indicates whether you play as a white or black.
@@ -109,7 +109,7 @@ class Chess {
     constructor(name, side) {
         this.domElementName = name;
 
-        this.squareNames = Object.keys(this.squares);
+        this.squareKeys = Object.keys(this.squares);
 
         this.side = side;
     }
@@ -120,7 +120,7 @@ class Chess {
      * @return array
      */
     getSquares() {
-        return this.squareNames;
+        return this.squareKeys;
     }
 
     /**
@@ -130,14 +130,14 @@ class Chess {
      * @return array
      */
     getSquare(key) {
-        return this.squareNames[key];
+        return this.squareKeys[key];
     }
 
     /**
-     * Get a peace from the square.
+     * Get a peace from the squares.
      *
      * @param square string
-     * @return array
+     * @return object
      */
     getPeace(square) {
         return this.squares[square];
@@ -148,16 +148,16 @@ class Chess {
      */
     createBoard() {
         if (this.side === 'black') {
-            this.squareNames.reverse();
+            this.squareKeys.reverse();
         }
 
-        this.squareNames.forEach((square, index) => {
+        this.squareKeys.forEach((square, index) => {
             const squareElement = document.createElement('div');
             squareElement.setAttribute('id', square);
             squareElement.setAttribute('data-square', square);
             squareElement.setAttribute('class', 'square');
 
-            this.addPeace(this.squares[square], squareElement);
+            this.addPeace(this.getPeace(square), squareElement);
 
             // add the newly created element and its content into the board
             const domElement = document.getElementById(this.domElementName);
@@ -270,8 +270,8 @@ class Chess {
      * @return boolean
      */
     takeSquare(targetSquare, targetSquareElement) {
-        let activePeace = this.squares[this.activeSquare];
-        let targetPeace = this.squares[targetSquare];
+        let activePeace = this.getPeace(this.activeSquare);
+        let targetPeace = this.getPeace(targetSquare);
 
         this.squares[this.activeSquare] = [];
         this.squares[targetSquare] = activePeace;
@@ -319,7 +319,7 @@ class Chess {
      * @return boolean
      */
     setAvailableSquares(square) {
-        let squares = this.squares[square].defineMoves(this);
+        let squares = this.getPeace(square).defineMoves(this);
 
         // if toggle click
         if (! squares.length || squares.every((el, index) => el === this.availableSquares[index])) {

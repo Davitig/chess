@@ -107,7 +107,7 @@ class Pawn extends Peace {
         let captureSquare = chess.activeSquare;
 
         squares.forEach(square => {
-            let peace = chess.squares[square];
+            let peace = chess.getPeace(square);
 
             // set self as en passant for another same peace.
             if (peace instanceof Pawn && ! Object.is(this, peace)) {
@@ -160,7 +160,7 @@ class Pawn extends Peace {
         let sliceEnd = squares.length;
 
         squares.forEach((square, index) => {
-            if (chess.squares[square] instanceof Peace) {
+            if (chess.getPeace(square) instanceof Peace) {
                 sliceEnd = index;
 
                 return false;
@@ -182,8 +182,8 @@ class Pawn extends Peace {
     getCaptureSquares(chess) {
         let squares = [];
 
-        let squareNames = chess.getSquares();
-        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareNames);
+        let squareKeys = chess.getSquares();
+        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
 
         let captureSquareNumber = chess.activeSquareNumber;
 
@@ -205,8 +205,8 @@ class Pawn extends Peace {
             squareKey2 = this.getNewKey(boardIsWhite, squareKey, 9);
         }
 
-        let captureSquare1 = squareNames[squareKey1];
-        let captureSquare2 = squareNames[squareKey2];
+        let captureSquare1 = squareKeys[squareKey1];
+        let captureSquare2 = squareKeys[squareKey2];
 
         if (chess.getSquareNumber(captureSquare1) === captureSquareNumber) {
             squares.push(captureSquare1);
@@ -217,7 +217,7 @@ class Pawn extends Peace {
         }
 
         squares = squares.filter(captureSquare => {
-            let peace = chess.squares[captureSquare];
+            let peace = chess.getPeace(captureSquare);
 
             return peace instanceof Peace && this.side !== peace.side;
         });
