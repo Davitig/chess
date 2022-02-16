@@ -12,14 +12,14 @@ const defineDiagonalSquares = (chess, distance, side) => {
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
-    let moveObjects = [
+    let moveFunctions = [
         newSquareKey => {return newSquareKey - 7;},
         newSquareKey => {return newSquareKey - 9;},
         newSquareKey => {return newSquareKey + 7;},
         newSquareKey => {return newSquareKey + 9;}
     ];
 
-    moveObjects.forEach(moveObject => {
+    moveFunctions.forEach(moveObject => {
         let newSquareKey = squareKey;
 
         for (let i = 1; i <= distance; i++) {
@@ -27,10 +27,11 @@ const defineDiagonalSquares = (chess, distance, side) => {
 
             let targetSquare = squares[newSquareKey];
 
+            // if the target square reaches the actual board array
             if (targetSquare !== undefined) {
                 let targetSquareAlphabet = chess.getSquareAlphabet(targetSquare);
 
-                // if the peace is on the edge and target square reaches the board
+                // if the peace is on the edge and the target square reaches the board
                 if (i === 1
                     && ['a', 'h'].includes(currentSquareAlphabet)
                     && ['a', 'h'].includes(targetSquareAlphabet)
@@ -42,7 +43,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
 
                 let targetSquarePeace = chess.getPeace(targetSquare);
 
-                // if target square contains a peace
+                // if target square contains a same side peace
                 if (targetSquarePeace instanceof Peace) {
                     if (targetSquarePeace.side === side) {
                         newSquares.pop();
@@ -51,7 +52,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
                     break;
                 }
 
-                // if the peace target square reaches the board edge
+                // if the target square reaches the board edge
                 if (['a', 'h'].includes(targetSquareAlphabet)) {
                     break;
                 }
@@ -76,14 +77,14 @@ const defineLinearSquares = (chess, distance, side) => {
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
-    let moveObjects = [
+    let moveFunctions = [
         newSquareKey => {return newSquareKey - 1;},
         newSquareKey => {return newSquareKey - 8;},
         newSquareKey => {return newSquareKey + 1;},
         newSquareKey => {return newSquareKey + 8;}
     ];
 
-    moveObjects.forEach(moveObject => {
+    moveFunctions.forEach(moveObject => {
         let newSquareKey = squareKey;
 
         for (let i = 1; i <= distance; i++) {
@@ -91,10 +92,11 @@ const defineLinearSquares = (chess, distance, side) => {
 
             let targetSquare = squares[newSquareKey];
 
+            // if the target square reaches the actual board array
             if (targetSquare !== undefined) {
                 let targetSquareAlphabet = chess.getSquareAlphabet(targetSquare);
 
-                // if the peace is on the alphabet edge and target square reaches the board
+                // if the peace is at the corner and the target square reaches the board
                 if (i === 1
                     && ((
                         currentSquareAlphabet === 'a' && targetSquareAlphabet === 'h'
@@ -109,7 +111,7 @@ const defineLinearSquares = (chess, distance, side) => {
 
                 let targetSquarePeace = chess.getPeace(targetSquare);
 
-                // if target square contains a peace
+                // if the target square contains a same side peace
                 if (targetSquarePeace instanceof Peace) {
                     if (targetSquarePeace.side === side) {
                         newSquares.pop();
@@ -118,7 +120,7 @@ const defineLinearSquares = (chess, distance, side) => {
                     break;
                 }
 
-                // if the peace target square reaches the board edge
+                // if the target square reaches the board edge
                 if (! ['a', 'h'].includes(currentSquareAlphabet)
                     && ['a', 'h'].includes(targetSquareAlphabet)
                 ) {
