@@ -1,4 +1,35 @@
 /**
+ * Pawn promotion peaces.
+ *
+ * @type object
+ */
+const pawnPromotion = {
+    /**
+     * Promotion peace names.
+     *
+     * @return array
+     */
+    getPeaceNames() {
+        return ['queen', 'rook', 'bishop', 'knight'];
+    },
+
+    /**
+     * Get promotion peaces.
+     *
+     * @param side string
+     * @return object
+     */
+    getPeaces(side) {
+        return {
+            queen: new Queen(side),
+            rook: new Rook(side),
+            bishop: new Bishop(side),
+            knight: new Knight(side)
+        }
+    },
+}
+
+/**
  * En passant container.
  *
  * @type object

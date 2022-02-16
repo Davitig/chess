@@ -41,6 +41,64 @@ class Pawn extends Peace {
         if (! this.takeEnPassantPeace(chess, targetSquare)) {
             this.setEnPassantPeace(chess, targetSquare);
         }
+
+        let targetSquareNumber = chess.getSquareNumber(targetSquare);
+
+        if ([1, 8].includes(targetSquareNumber)) {
+            this.createPromotionPeacesElement(chess, targetSquare);
+        }
+    }
+
+    /**
+     * Create a promotion peaces element.
+     *
+     * @param chess object
+     * @param targetSquare string
+     * @return HTMLDivElement
+     */
+    createPromotionPeacesElement(chess, targetSquare) {
+        const promElement = document.createElement('div');
+
+        promElement.setAttribute('id', 'promotion');
+        promElement.setAttribute('data-prom-square', targetSquare);
+
+        let peaceNames = pawnPromotion.getPeaceNames();
+
+        const promSquareElement = document.getElementById(targetSquare);
+        let psRect = promSquareElement.getBoundingClientRect();
+
+        if (chess.side !== this.side) {
+            peaceNames.reverse();
+        }
+
+        peaceNames.forEach(name => {
+            const peaceElement = document.createElement('div');
+            peaceElement.setAttribute('class', 'peace');
+            peaceElement.setAttribute('data-prom-peace', name);
+
+            promElement.appendChild(peaceElement);
+        });
+
+        promElement.querySelectorAll('.peace').forEach(peaceElement => {
+            let peaceName = peaceElement.getAttribute('data-prom-peace');
+
+            let peaceFile = chess.getPeaceFileByOrder(
+                pawnPromotion.getPeaces(this.side)[peaceName].getFile()
+            );
+
+            peaceElement.setAttribute('data-file', peaceFile)
+        });
+
+        chess.setBoardBgVisibility(1);
+
+        document.getElementById(chess.boardElementName).before(promElement);
+
+        promElement.style.top = psRect.top + 'px';
+        promElement.style.left = psRect.left + 'px';
+
+        if (chess.side !== this.side) {
+            promElement.style.top = (psRect.bottom - promElement.clientHeight) + 'px';
+        }
     }
 
     /**
@@ -60,7 +118,7 @@ class Pawn extends Peace {
 
         chess.capturePeaceElement(
             this.enPassant.pawn,
-            document.querySelector('#' + this.enPassant.activeSquare),
+            document.getElementById(this.enPassant.activeSquare),
             false
         )
 
@@ -90,10 +148,10 @@ class Pawn extends Peace {
         let targetSquareKey = chess.getSquaresArrayKey(targetSquare);
 
         let sideSquare1 = chess.getSquare(
-            this.side === "white" ? targetSquareKey - 1 : targetSquareKey + 1
+            this.side === 'white' ? targetSquareKey - 1 : targetSquareKey + 1
         );
         let sideSquare2 = chess.getSquare(
-            this.side === "white" ? targetSquareKey + 1 : targetSquareKey - 1
+            this.side === 'white' ? targetSquareKey + 1 : targetSquareKey - 1
         );
 
         if (chess.getSquareNumber(sideSquare1) === targetSquareNumber) {
@@ -139,7 +197,7 @@ class Pawn extends Peace {
 
         let squares = [];
 
-        if (this.side === "white") {
+        if (this.side === 'white') {
             newNumber++;
         } else {
             newNumber--;
@@ -147,7 +205,7 @@ class Pawn extends Peace {
 
         squares.push(alphabet + newNumber);
 
-        if (this.side === "white" && number === 2) {
+        if (this.side === 'white' && number === 2) {
             newNumber++;
             squares.push(alphabet + newNumber);
         } else if (this.side === "black" && number === 7) {
@@ -189,17 +247,17 @@ class Pawn extends Peace {
 
         let captureSquareNumber = chess.activeSquareNumber;
 
-        if (this.side === "white") {
+        if (this.side === 'white') {
             captureSquareNumber++;
         } else {
             captureSquareNumber--;
         }
 
-        let boardIsWhite = chess.side === "white";
+        let boardIsWhite = chess.side === 'white';
 
         let squareKey1, squareKey2;
 
-        if (this.side === "white") {
+        if (this.side === 'white') {
             squareKey1 = this.getNewKey(! boardIsWhite, squareKey, 7);
             squareKey2 = this.getNewKey(! boardIsWhite, squareKey, 9);
         } else {

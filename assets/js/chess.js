@@ -1,10 +1,10 @@
 class Chess {
     /**
-     * DOM Element Name.
+     * Board DOM element name.
      *
      * @type object
      */
-    domElementName;
+    boardElementName;
 
     /**
      * List of squares with its predefined peaces.
@@ -107,7 +107,7 @@ class Chess {
      * @param side string
      */
     constructor(name, side) {
-        this.domElementName = name;
+        this.boardElementName = name;
 
         this.squareKeys = Object.keys(this.squares);
 
@@ -144,6 +144,31 @@ class Chess {
     }
 
     /**
+     * Get the active peace from the squares.
+     *
+     * @return object
+     */
+    getActivePeace() {
+        return this.squares[this.activeSquare];
+    }
+
+    /**
+     * Get peace file by order.
+     *
+     * @param file string|object
+     * @return string
+     */
+    getPeaceFileByOrder(file) {
+        if (file.constructor === Object) {
+            file = file[this.peaceLooks];
+
+            this.peaceLooks = ((this.peaceLooks === 'right') ? 'left' : 'right');
+        }
+
+        return file;
+    }
+
+    /**
      * Create a new chess board.
      */
     createBoard() {
@@ -151,6 +176,25 @@ class Chess {
             this.squareKeys.reverse();
         }
 
+        // create a chess background element to block DOM actions at specific time
+        const chessBoardBg = document.createElement('div');
+        chessBoardBg.setAttribute('id', 'chessboard-bg');
+        chessBoardBg.setAttribute('data-visible', 0);
+        document.body.appendChild(chessBoardBg);
+
+        // set necessary class names to the board element
+        const boardElement = document.getElementById(this.boardElementName);
+        boardElement.setAttribute('class', this.side + ' clearfix');
+
+        // create captured peaces element
+        boardElement.before(this.createCapturedPeacesElement(
+            this.side, 'opponent'
+        ));
+        boardElement.after(this.createCapturedPeacesElement(
+            this.side === 'white' ? 'black' : 'white', 'self'
+        ));
+
+        // draw the board with its peaces
         this.squareKeys.forEach((square, index) => {
             const squareElement = document.createElement('div');
             squareElement.setAttribute('id', square);
@@ -160,12 +204,10 @@ class Chess {
             this.addPeace(this.getPeace(square), squareElement);
 
             // add the newly created element and its content into the board
-            const domElement = document.getElementById(this.domElementName);
-            domElement.appendChild(squareElement);
-            domElement.setAttribute('class', this.side === 'white' ? 'white' : 'black');
+            boardElement.appendChild(squareElement);
 
             if ((index + 1) % 8 === 0) {
-                domElement.appendChild(document.createElement('br'));
+                boardElement.appendChild(document.createElement('br'));
             }
         });
 
@@ -188,17 +230,12 @@ class Chess {
 
         this.squares[square] = peace;
 
-        let peaceFile = peace.getFile();
-
-        if (peaceFile.constructor === Object) {
-            peaceFile = peaceFile[this.peaceLooks];
-
-            this.peaceLooks = ((this.peaceLooks === 'right') ? 'left' : 'right');
-        }
+        let peaceFile = this.getPeaceFileByOrder(peace.getFile());
 
         const peaceElement = document.createElement('div');
+        peaceElement.setAttribute('class',  'peace');
         peaceElement.setAttribute('data-peace', peace.name);
-        peaceElement.setAttribute('class',  'peace ' + peaceFile);
+        peaceElement.setAttribute('data-file', peaceFile);
 
         const activePeaceElement = squareElement.querySelector('.peace');
 
@@ -222,6 +259,8 @@ class Chess {
                 this.onPeaceClick(element.parentNode);
             } else if (element.getAttribute('data-available') === '1') {
                 this.onAvailableSquareClick(element);
+            } else if (element.hasAttribute('data-prom-peace')) {
+                this.onPeacePromotion(element);
             } else {
                 this.unsetSquares(element);
             }
@@ -263,6 +302,27 @@ class Chess {
     }
 
     /**
+     * On peace promotion click.
+     *
+     * @param peaceElement object
+     */
+    onPeacePromotion(peaceElement) {
+        let peaceName = peaceElement.getAttribute('data-prom-peace');
+        let promSquare = peaceElement.parentNode.getAttribute('data-prom-square');
+
+        chess.addPeace(
+            pawnPromotion.getPeaces(this.getPeace(promSquare).side)[peaceName],
+            document.querySelector(
+                '#' + peaceElement.parentNode.getAttribute('data-prom-square')
+            )
+        );
+
+        this.setBoardBgVisibility(0)
+
+        document.getElementById('promotion').remove();
+    }
+
+    /**
      * Take the square.
      *
      * @param targetSquare string
@@ -270,7 +330,7 @@ class Chess {
      * @return boolean
      */
     takeSquare(targetSquare, targetSquareElement) {
-        let activePeace = this.getPeace(this.activeSquare);
+        let activePeace = this.getActivePeace();
         let targetPeace = this.getPeace(targetSquare);
 
         this.squares[this.activeSquare] = [];
@@ -333,7 +393,7 @@ class Chess {
         this.availableSquares = squares;
 
         squares.forEach(square => {
-            const squareElement = document.querySelector('#' + square);
+            const squareElement = document.getElementById(square);
 
             squareElement.setAttribute('data-available', 1);
         });
@@ -384,7 +444,7 @@ class Chess {
         const targetPeaceElement = targetSquareElement.querySelector('.peace');
 
         if (targetPeace instanceof Peace && targetPeaceElement) {
-            this.collectCapturedPeaceElement(targetPeace.name, targetPeaceElement);
+            this.collectCapturedPeaceElement(targetPeace, targetPeaceElement);
         }
 
         if (replaceWithActive) {
@@ -396,13 +456,52 @@ class Chess {
     /**
      * Collect the captured peace element.
      *
-     * @param peaceName string
+     * @param peace Peace
      * @param peaceElement object
      */
-    collectCapturedPeaceElement(peaceName, peaceElement) {
-        const capturedPeacesElement = document.querySelector('#self .' + peaceName + 's');
+    collectCapturedPeaceElement(peace, peaceElement) {
+        const capturedPeacesElement = document.querySelector(
+            '#captured-' + peace.side + ' .' + peace.name + 's'
+        );
 
         capturedPeacesElement.appendChild(peaceElement);
+    }
+
+    /**
+     * Create a captured peaces element.
+     *
+     * @param side string
+     * @param sideDef string
+     * @return HTMLDivElement
+     */
+    createCapturedPeacesElement(side, sideDef) {
+        const element = document.createElement('div');
+
+        element.setAttribute('id', 'captured-' + side);
+        element.setAttribute('class', 'captured-peaces ' + sideDef);
+
+        let peaceNames = ['queens', 'rooks', 'bishops', 'knights', 'pawns'];
+
+        peaceNames.forEach(name => {
+            const peaceElement = document.createElement('div');
+            peaceElement.setAttribute('class', 'peaces ' + name);
+
+            element.appendChild(peaceElement);
+        });
+
+        return element;
+    }
+
+    /**
+     * Set visibility of the board background.
+     *
+     * @param value integer
+     */
+    setBoardBgVisibility(value) {
+        const chessBoardBg = document.querySelector('#chessboard-bg');
+
+        chessBoardBg.setAttribute('data-visible', parseInt(value));
+        chessBoardBg.style.height = document.body.clientHeight + 'px';
     }
 
     /**
