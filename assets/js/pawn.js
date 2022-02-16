@@ -64,7 +64,7 @@ class Pawn extends Peace {
             false
         )
 
-        this.enPassant = {};
+        enPassant.clear();
 
         return true;
     }
@@ -118,6 +118,8 @@ class Pawn extends Peace {
                 peace.enPassant.pawn = this;
                 peace.enPassant.activeSquare = targetSquare;
                 peace.enPassant.captureSquare = captureSquare;
+
+                enPassant.set(peace);
             }
         });
 
