@@ -243,7 +243,7 @@ class Pawn extends Peace {
         let squares = [];
 
         let squareKeys = chess.getSquares();
-        let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squareKeys);
+        let squareKey = chess.getSquaresArrayKey();
 
         let captureSquareNumber = chess.activeSquareNumber;
 

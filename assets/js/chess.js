@@ -540,10 +540,16 @@ class Chess {
      * @return boolean|number
      */
     getSquaresArrayKey(square, squares = undefined) {
-        let array = ((squares === undefined) ? this.getSquares() : squares);
+        if (square === undefined) {
+            square = chess.activeSquare;
+        }
 
-        for (let i = 0; i < array.length; i++) {
-            if (array[i] === square) {
+        if (squares === undefined) {
+            squares = this.getSquares();
+        }
+
+        for (let i = 0; i < squares.length; i++) {
+            if (squares[i] === square) {
                 return i;
             }
         }

@@ -8,7 +8,7 @@
  */
 const defineDiagonalSquares = (chess, distance, side) => {
     let squares = chess.getSquares();
-    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squares);
+    let squareKey = chess.getSquaresArrayKey();
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
@@ -72,7 +72,7 @@ const defineDiagonalSquares = (chess, distance, side) => {
  */
 const defineLinearSquares = (chess, distance, side) => {
     let squares = chess.getSquares();
-    let squareKey = chess.getSquaresArrayKey(chess.activeSquare, squares);
+    let squareKey = chess.getSquaresArrayKey();
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
