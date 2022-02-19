@@ -47,10 +47,11 @@ class Rook extends Peace {
      *
      * @param chess object
      * @param sort boolean
+     * @param fullDef boolean
      * @return array
      */
-    defineMoves(chess, sort = false) {
-        return this.getMovableSquares(chess, sort);
+    defineMoves(chess, sort = false, fullDef = false) {
+        return this.getMovableSquares(chess, sort, fullDef);
     }
 
     /**
@@ -58,9 +59,10 @@ class Rook extends Peace {
      *
      * @param chess object
      * @param sort boolean
+     * @param fullDef boolean
      * @return array
      */
-    getMovableSquares(chess, sort = false) {
-        return defineLinearSquares(chess, 7, this.side, this.getSquare(), sort);
+    getMovableSquares(chess, sort = false, fullDef = false) {
+        return defineLinearSquares(chess, 7, this.side, this.getSquare(), sort, fullDef);
     }
 }

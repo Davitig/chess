@@ -63,9 +63,22 @@ class Pawn extends Peace {
      *
      * @param chess object
      * @param sort boolean
+     * @param fullDef boolean
      * @return array
      */
-    defineMoves(chess, sort = false) {
+    defineMoves(chess, sort = false, fullDef = false) {
+        return this.getMovableSquares(chess, sort, fullDef)
+    }
+
+    /**
+     * Get movable squares.
+     *
+     * @param chess object
+     * @param sort boolean
+     * @param fullDef boolean
+     * @return array
+     */
+    getMovableSquares(chess, sort = false, fullDef = false) {
         let square = this.getSquare();
         let alphabet = chess.getSquareAlphabet(square);
         let number, newNumber;
@@ -105,9 +118,9 @@ class Pawn extends Peace {
         squares = squares.slice(0, sliceEnd);
 
         if (sort) {
-            squares = arrayChunk(this.getCaptureSquares(chess, square), 1);
+            squares = arrayChunk(this.getCaptureSquares(chess, fullDef), 1);
         } else {
-            squares = squares.concat(this.getCaptureSquares(chess, square));
+            squares = squares.concat(this.getCaptureSquares(chess, fullDef));
         }
 
         return squares;
@@ -117,9 +130,10 @@ class Pawn extends Peace {
      * Get capture squares.
      *
      * @param chess object
+     * @param fullDef boolean
      * @return array
      */
-    getCaptureSquares(chess) {
+    getCaptureSquares(chess, fullDef = false) {
         let squares = [];
 
         let squareKeys = chess.getSquares();
@@ -159,7 +173,8 @@ class Pawn extends Peace {
         squares = squares.filter(captureSquare => {
             let peace = chess.getPeace(captureSquare);
 
-            return peace instanceof Peace && this.side !== peace.side;
+            // fullDef to protect the peace from the king
+            return fullDef ? true : peace instanceof Peace && this.side !== peace.side
         });
 
         if (this.enPassant.captureSquare) {

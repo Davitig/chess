@@ -6,9 +6,10 @@
  * @param side string
  * @param square string
  * @param sort boolean
+ * @param fullDef boolean
  * @return array
  */
-const defineDiagonalSquares = (chess, distance, side, square, sort = false) => {
+const defineDiagonalSquares = (chess, distance, side, square, sort = false, fullDef = false) => {
     let squares = chess.getSquares();
     let squareKey = chess.getSquaresArrayKey(square);
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
@@ -23,6 +24,10 @@ const defineDiagonalSquares = (chess, distance, side, square, sort = false) => {
 
     moveFunctions.forEach((moveFunction, line) => {
         let newSquareKey = squareKey;
+
+        let fullDefs = [];
+
+        fullDefs[line] = fullDef;
 
         if (sort) {
             newSquares[line] = [];
@@ -53,14 +58,22 @@ const defineDiagonalSquares = (chess, distance, side, square, sort = false) => {
 
                 let targetPeace = chess.getPeace(targetSquare);
 
-                // if target square contains a peace
                 if (targetPeace instanceof Peace) {
-                    // if same side peace
                     if (targetPeace.side === side) {
-                        sort ? newSquares[line].pop() : newSquares.pop();
+                        // fullDef to protect the peace from the king
+                        if (! fullDefs[line]) {
+                            sort ? newSquares[line].pop() : newSquares.pop();
+                        } else {
+                            fullDefs[line] = false;
+                        }
                     }
 
-                    break;
+                    // fullDef to continue checking squares through the king
+                    if (! fullDefs[line]
+                        && ! (targetPeace instanceof King && targetPeace.side !== side)
+                    ) {
+                        break;
+                    }
                 }
 
                 // if the target square reaches the board edge
@@ -82,9 +95,10 @@ const defineDiagonalSquares = (chess, distance, side, square, sort = false) => {
  * @param side string
  * @param square string
  * @param sort boolean
+ * @param fullDef boolean
  * @return array
  */
-const defineLinearSquares = (chess, distance, side, square, sort = false) => {
+const defineLinearSquares = (chess, distance, side, square, sort = false, fullDef = false) => {
     let squares = chess.getSquares();
     let squareKey = chess.getSquaresArrayKey(square);
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
@@ -99,6 +113,10 @@ const defineLinearSquares = (chess, distance, side, square, sort = false) => {
 
     moveFunctions.forEach((moveFunction, line) => {
         let newSquareKey = squareKey;
+
+        let fullDefs = [];
+
+        fullDefs[line] = fullDef;
 
         if (sort) {
             newSquares[line] = [];
@@ -132,14 +150,22 @@ const defineLinearSquares = (chess, distance, side, square, sort = false) => {
 
                 let targetPeace = chess.getPeace(targetSquare);
 
-                // if target square contains a peace
                 if (targetPeace instanceof Peace) {
-                    // if same side peace
                     if (targetPeace.side === side) {
-                        sort ? newSquares[line].pop() : newSquares.pop();
+                        // fullDef to protect the peace from the king
+                        if (! fullDefs[line]) {
+                            sort ? newSquares[line].pop() : newSquares.pop();
+                        } else {
+                            fullDefs[line] = false
+                        }
                     }
 
-                    break;
+                    // fullDef to continue checking squares through the king
+                    if (! fullDefs[line]
+                        && ! (targetPeace instanceof King && targetPeace.side !== side)
+                    ) {
+                        break;
+                    }
                 }
 
                 // if the target square reaches the board edge

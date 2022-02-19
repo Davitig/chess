@@ -17,25 +17,25 @@ class Chess {
         c8: new Bishop('black'),
         d8: new Queen('black'),
         e8: new King('black'),
-        f8: [],
+        f8: new Bishop('black'),
         g8: new Knight('black'),
         h8: new Rook('black'),
         a7: new Pawn('black'),
         b7: new Pawn('black'),
         c7: new Pawn('black'),
         d7: new Pawn('black'),
-        e7: [],
+        e7: new Pawn('black'),
         f7: new Pawn('black'),
         g7: new Pawn('black'),
         h7: new Pawn('black'),
         a6: [], b6: [], c6: [], d6: [], e6: [], f6: [], g6: [], h6: [],
-        a5: [], b5: [], c5: new Bishop('black'), d5: [], e5: new Pawn('black'), f5: [], g5: [], h5: [],
-        a4: [], b4: [], c4: [], d4: new Pawn('white'), e4: [], f4: [], g4: [], h4: [],
-        a3: [], b3: [], c3: [], d3: [], e3: new King('white'), f3: [], g3: [], h3: [],
+        a5: [], b5: [], c5: [], d5: [], e5: [], f5: [], g5: [], h5: [],
+        a4: [], b4: [], c4: [], d4: [], e4: [], f4: [], g4: [], h4: [],
+        a3: [], b3: [], c3: [], d3: [], e3: [], f3: [], g3: [], h3: [],
         a2: new Pawn('white'),
         b2: new Pawn('white'),
         c2: new Pawn('white'),
-        d2: [],
+        d2: new Pawn('white'),
         e2: new Pawn('white'),
         f2: new Pawn('white'),
         g2: new Pawn('white'),
@@ -44,7 +44,7 @@ class Chess {
         b1: new Knight('white'),
         c1: new Bishop('white'),
         d1: new Queen('white'),
-        e1: [],
+        e1: new King('white'),
         f1: new Bishop('white'),
         g1: new Knight('white'),
         h1: new Rook('white')
@@ -448,7 +448,15 @@ class Chess {
     setAvailableSquares() {
         let peace = this.getActivePeace();
 
+        if (peace instanceof King) {
+            peace.safeMode = true;
+        }
+
         let squares = peace.defineMoves(this);
+
+        if (peace instanceof King) {
+            peace.safeMode = false;
+        }
 
         // if toggle click
         if (! squares.length
@@ -463,7 +471,9 @@ class Chess {
 
         this.availableSquares = squares;
 
-        this.intersectAvailableAndCheckerSquares()
+        if (! (peace instanceof King)) {
+            this.intersectAvailableAndCheckerSquares();
+        }
 
         this.availableSquares.forEach(square => {
             const squareElement = document.getElementById(square);
@@ -475,7 +485,7 @@ class Chess {
     }
 
     /**
-     * If king is on the check then leave only the king cover squares.
+     * If the king peace is on the check, defend it from another peaces
      *
      * @return boolean
      */
@@ -486,7 +496,7 @@ class Chess {
             return false;
         }
 
-        // if king check then remove all available squares rather than king cover squares
+        // remove all available squares rather than king cover squares
         for (let i = 0; i < checkerPeaces.length; i++) {
             this.availableSquares = this.availableSquares.filter(square => {
                 return square === checkerPeaces[i].checkerPeace.getSquare()
@@ -505,11 +515,10 @@ class Chess {
      * @return array
      */
     imitateCheck() {
-        let squares = this.getSquares();
         let checkerPeaces = [];
 
-        let activeSquare = this.getActiveSquare();
         let activePeace = this.getActivePeace();
+        let activeSquare = this.getActiveSquare();
 
         if (! (activePeace instanceof King)) {
             // temporarily unset the active peace from the squares
@@ -517,10 +526,13 @@ class Chess {
         }
 
         // imitate check from every peace
-        squares.forEach(square => {
+        this.getSquares().forEach(square => {
             let peace = this.getPeace(square);
 
-            if (peace instanceof Peace && peace.side !== this.side) {
+            if (peace instanceof Peace
+                && peace.side !== activePeace.side
+                && ! (peace instanceof King)
+            ) {
                 let checkObj = peace.check(this, peace, square);
 
                 if (checkObj.length && checkObj[0].kingSquare) {

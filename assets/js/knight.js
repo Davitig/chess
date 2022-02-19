@@ -54,10 +54,11 @@ class Knight extends Peace {
      *
      * @param chess object
      * @param sort boolean
+     * @param fullDef boolean
      * @return array
      */
-    defineMoves(chess, sort = false) {
-        return this.getMovableSquares(chess, sort);
+    defineMoves(chess, sort = false, fullDef = false) {
+        return this.getMovableSquares(chess, sort, fullDef);
     }
 
     /**
@@ -65,9 +66,10 @@ class Knight extends Peace {
      *
      * @param chess object
      * @param sort boolean
+     * @param fullDef boolean
      * @return array
      */
-    getMovableSquares(chess, sort = false) {
+    getMovableSquares(chess, sort = false, fullDef = false) {
         let squares = chess.getSquares();
         let squareKey = chess.getSquaresArrayKey(this.getSquare());
 
@@ -79,13 +81,17 @@ class Knight extends Peace {
         });
 
         if (! sort) {
-            return newSquares.filter(this.getMovableSquaresFilterFunction(this.getSquare()));
+            return newSquares.filter(
+                this.getMovableSquaresFilterFunction(this.getSquare(), fullDef)
+            );
         }
 
         newSquares = arrayChunk(newSquares, 2);
 
         for (let i = 0; i < newSquares.length; i++) {
-            newSquares[i] = newSquares[i].filter(this.getMovableSquaresFilterFunction(this.getSquare()));
+            newSquares[i] = newSquares[i].filter(
+                this.getMovableSquaresFilterFunction(this.getSquare(), fullDef)
+            );
         }
 
         return newSquares;
@@ -94,13 +100,14 @@ class Knight extends Peace {
     /**
      * Get movable squares filter function.
      *
-     * @param square
+     * @param square string
+     * @param fullDef boolean
      * @return function
      */
-    getMovableSquaresFilterFunction(square) {
+    getMovableSquaresFilterFunction(square, fullDef = false) {
         let currentSquareAlphabet = chess.getSquareAlphabet(square);
 
-        return targetSquare => {
+        return (targetSquare) => {
             // if the target square reaches the actual board array
             if (targetSquare === undefined) {
                 return false;
@@ -119,8 +126,9 @@ class Knight extends Peace {
 
             let targetPeace = chess.getPeace(targetSquare);
 
-            // if target square contains a same side peace
-            return ! (targetPeace instanceof Peace && targetPeace.side === this.side);
+            // fullDef to protect the peace from the king,
+            // otherwise check if the peace isn't from the same side
+            return fullDef ? true : ! (targetPeace instanceof Peace && targetPeace.side === this.side);
         };
     }
 }

@@ -64,7 +64,7 @@ class Peace {
      *
      * @param chess object
      * @param peaces array
-     * @return array
+     * @return string
      */
     check(chess, peaces) {
         let availableSquares = [];
@@ -89,22 +89,18 @@ class Peace {
             }
         });
 
-        let kingSquare;
-
         for (let i = 0; i < availableSquares.length; i++) {
-            kingSquare = availableSquares[i].find(square => {
+            availableSquares[i].find(square => {
                 let targetPeace = chess.getPeace(square);
 
-                return targetPeace instanceof King && targetPeace.side !== peaces[i].side;
+                if (targetPeace instanceof King && targetPeace.side !== peaces[i].side) {
+                    checkerPeaces.push({
+                        kingSquare: targetPeace.getSquare(),
+                        checkerPeace: peaces[i],
+                        checkerSquares: availableSquares[i]
+                    });
+                }
             });
-
-            if (kingSquare) {
-                checkerPeaces.push({
-                    kingSquare: kingSquare,
-                    checkerPeace: kingSquare ? peaces[i] : [],
-                    checkerSquares: kingSquare ? availableSquares[i] : []
-                });
-            }
         }
 
         return checkerPeaces;
