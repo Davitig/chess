@@ -6,8 +6,9 @@ html, body {margin: 0; padding: 0;}
 .white .square:nth-child(even) {background-color: #deb887;}
 .black .square:nth-child(odd) {background-color: #deb887;}
 .square {float: left; width: 90px; height: 90px; text-align: center;}
-.square[data-available="1"] {cursor: pointer; outline: 1px solid #6da465; outline-offset: -1px;}
-.square[data-active="1"] {outline: 1px solid #6da465; outline-offset: -1px;}
+.square[data-available="1"] {cursor: pointer; outline: 1px solid #6da465; outline-offset: -8px;}
+.square[data-active="1"] {outline: 1px solid #6da465; outline-offset: -8px;}
+.square[data-check="1"] {outline: 1px solid #f00; outline-offset: -8px;}
 .peace {
     width: 90px; height:90px;
     background-repeat: no-repeat; background-position:center; background-size: auto 60px; cursor: pointer;

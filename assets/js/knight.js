@@ -31,39 +31,76 @@ class Knight extends Peace {
     }
 
     /**
+     * Invoke on take square.
+     *
+     * @param chess object
+     */
+    onTakeSquare(chess) {
+        // make the king check action
+        this.checkAction(chess, chess.getPeaces().filter(peace => {
+            return peace instanceof Peace
+                && peace.side === this.side
+                && ! (peace instanceof King)
+                && (peace instanceof Queen
+                    || peace instanceof Rook
+                    || peace instanceof Bishop
+                    || Object.is(this, peace)
+                )
+        }));
+    }
+
+    /**
      * Define squares for the peace.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    defineMoves(chess) {
-        return this.getMovableSquares(chess);
+    defineMoves(chess, sort = false) {
+        return this.getMovableSquares(chess, sort);
     }
 
     /**
      * Get movable squares.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    getMovableSquares(chess) {
+    getMovableSquares(chess, sort = false) {
         let squares = chess.getSquares();
-        let squareKey = chess.getSquaresArrayKey();
+        let squareKey = chess.getSquaresArrayKey(this.getSquare());
 
+        let squareLines = [6, 15, 17, 10, -6, -15, -17, -10];
         let newSquares = [];
 
-        newSquares.push(squares[squareKey - 6]);
-        newSquares.push(squares[squareKey - 15]);
-        newSquares.push(squares[squareKey - 17]);
-        newSquares.push(squares[squareKey - 10]);
-        newSquares.push(squares[squareKey + 6]);
-        newSquares.push(squares[squareKey + 15]);
-        newSquares.push(squares[squareKey + 17]);
-        newSquares.push(squares[squareKey + 10]);
+        squareLines.forEach((number, index) => {
+            newSquares[index] = squares[squareKey + number];
+        });
 
-        let currentSquareAlphabet = chess.getSquareAlphabet();
+        if (! sort) {
+            return newSquares.filter(this.getMovableSquaresFilterFunction(this.getSquare()));
+        }
 
-        newSquares = newSquares.filter(targetSquare => {
+        newSquares = arrayChunk(newSquares, 2);
+
+        for (let i = 0; i < newSquares.length; i++) {
+            newSquares[i] = newSquares[i].filter(this.getMovableSquaresFilterFunction(this.getSquare()));
+        }
+
+        return newSquares;
+    }
+
+    /**
+     * Get movable squares filter function.
+     *
+     * @param square
+     * @return function
+     */
+    getMovableSquaresFilterFunction(square) {
+        let currentSquareAlphabet = chess.getSquareAlphabet(square);
+
+        return targetSquare => {
             // if the target square reaches the actual board array
             if (targetSquare === undefined) {
                 return false;
@@ -80,16 +117,10 @@ class Knight extends Peace {
                 return false;
             }
 
-            let targetSquarePeace = chess.getPeace(targetSquare);
+            let targetPeace = chess.getPeace(targetSquare);
 
-            // if target square contains a peace
-            if (targetSquarePeace instanceof Peace && targetSquarePeace.side === this.side) {
-                return false;
-            }
-
-            return true;
-        });
-
-        return newSquares;
+            // if target square contains a same side peace
+            return ! (targetPeace instanceof Peace && targetPeace.side === this.side);
+        };
     }
 }

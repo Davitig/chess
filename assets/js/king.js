@@ -28,21 +28,23 @@ class King extends Peace {
      * Define squares for the peace.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    defineMoves(chess) {
-        return this.getMovableSquares(chess);
+    defineMoves(chess, sort = false) {
+        return this.getMovableSquares(chess, sort);
     }
 
     /**
      * Get movable squares.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    getMovableSquares(chess) {
-        return defineDiagonalSquares(chess, 1, this.side).concat(
-            defineLinearSquares(chess, 1, this.side)
+    getMovableSquares(chess, sort = false) {
+        return defineDiagonalSquares(chess, 1, this.side, this.getSquare(), sort).concat(
+            defineLinearSquares(chess, 1, this.side, this.getSquare(), sort)
         );
     }
 }

@@ -35,165 +35,41 @@ class Pawn extends Peace {
      * Invoke on take square.
      *
      * @param chess object
-     * @param targetSquare string
      */
-    onTakeSquare(chess, targetSquare) {
-        if (! this.takeEnPassantPeace(chess, targetSquare)) {
-            this.setEnPassantPeace(chess, targetSquare);
+    onTakeSquare(chess) {
+        // after the pawn move, run the king check action from every peace
+        this.checkAction(chess, chess.getPeaces().filter(peace => {
+            return peace instanceof Peace
+                && peace.side === this.side
+                && ! (peace instanceof King)
+                || Object.is(this, peace)
+        }));
+
+        // take or set en passant peace if its available
+        if (! this.takesEnPassantPeace(chess)) {
+            this.setsEnPassantPeace(chess);
         }
 
-        let targetSquareNumber = chess.getSquareNumber(targetSquare);
+        let targetSquareNumber = chess.getSquareNumber(this.getSquare());
 
+        // promote a peace if the pawn get to the last row square
         if ([1, 8].includes(targetSquareNumber)) {
-            this.createPromotionPeacesElement(chess, targetSquare);
+            this.createPromotionPeacesElement(chess);
         }
-    }
-
-    /**
-     * Create a promotion peaces element.
-     *
-     * @param chess object
-     * @param targetSquare string
-     * @return HTMLDivElement
-     */
-    createPromotionPeacesElement(chess, targetSquare) {
-        const promElement = document.createElement('div');
-
-        promElement.setAttribute('id', 'promotion');
-        promElement.setAttribute('data-prom-square', targetSquare);
-
-        let peaceNames = pawnPromotion.getPeaceNames();
-
-        const promSquareElement = document.getElementById(targetSquare);
-        let psRect = promSquareElement.getBoundingClientRect();
-
-        if (chess.side !== this.side) {
-            peaceNames.reverse();
-        }
-
-        peaceNames.forEach(name => {
-            const peaceElement = document.createElement('div');
-            peaceElement.setAttribute('class', 'peace');
-            peaceElement.setAttribute('data-prom-peace', name);
-
-            promElement.appendChild(peaceElement);
-        });
-
-        promElement.querySelectorAll('.peace').forEach(peaceElement => {
-            let peaceName = peaceElement.getAttribute('data-prom-peace');
-
-            let peaceFile = chess.getPeaceFileByOrder(
-                pawnPromotion.getPeaces(this.side)[peaceName].getFile()
-            );
-
-            peaceElement.setAttribute('data-file', peaceFile)
-        });
-
-        chess.setBoardBgVisibility(1);
-
-        document.getElementById(chess.boardElementName).before(promElement);
-
-        promElement.style.top = psRect.top + 'px';
-        promElement.style.left = psRect.left + 'px';
-
-        if (chess.side !== this.side) {
-            promElement.style.top = (psRect.bottom - promElement.clientHeight) + 'px';
-        }
-    }
-
-    /**
-     * Take en passant peace.
-     *
-     * @param chess object
-     * @param targetSquare string
-     */
-    takeEnPassantPeace(chess, targetSquare) {
-        if (! (this.enPassant.pawn instanceof Pawn)
-            || chess.getSquareAlphabet(this.enPassant.activeSquare) !== chess.getSquareAlphabet(targetSquare)
-        ) {
-            return false;
-        }
-
-        chess.squares[this.enPassant.activeSquare] = [];
-
-        chess.capturePeaceElement(
-            this.enPassant.pawn,
-            document.getElementById(this.enPassant.activeSquare),
-            false
-        )
-
-        enPassant.clear();
-
-        return true;
-    }
-
-    /**
-     * Set self as en passant for another same peace.
-     *
-     * @param chess object
-     * @param targetSquare string
-     */
-    setEnPassantPeace(chess, targetSquare) {
-        let targetSquareNumber = chess.getSquareNumber(targetSquare);
-
-        if (! ([4, 5].includes(targetSquareNumber))
-            || chess.availableSquares.length < 2
-        ) {
-            return false;
-        }
-
-        let squares = [];
-        squares = chess.availableSquares.concat(squares);
-
-        let targetSquareKey = chess.getSquaresArrayKey(targetSquare);
-
-        let sideSquare1 = chess.getSquare(
-            this.side === 'white' ? targetSquareKey - 1 : targetSquareKey + 1
-        );
-        let sideSquare2 = chess.getSquare(
-            this.side === 'white' ? targetSquareKey + 1 : targetSquareKey - 1
-        );
-
-        if (chess.getSquareNumber(sideSquare1) === targetSquareNumber) {
-            squares.push(sideSquare1);
-        }
-
-        if (chess.getSquareNumber(sideSquare2) === targetSquareNumber) {
-            squares.push(sideSquare2);
-        }
-
-        let captureSquare = chess.activeSquare;
-
-        squares.forEach(square => {
-            let peace = chess.getPeace(square);
-
-            // set self as en passant for another same peace.
-            if (peace instanceof Pawn && ! Object.is(this, peace)) {
-                if (targetSquareNumber === chess.getSquareNumber(square)) {
-                    captureSquare = chess.availableSquares[0];
-                }
-
-                peace.enPassant.pawn = this;
-                peace.enPassant.activeSquare = targetSquare;
-                peace.enPassant.captureSquare = captureSquare;
-
-                enPassant.set(peace);
-            }
-        });
-
-        return true;
     }
 
     /**
      * Define squares for the peace.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    defineMoves(chess) {
-        let alphabet = chess.activeSquareAlphabet;
+    defineMoves(chess, sort = false) {
+        let square = this.getSquare();
+        let alphabet = chess.getSquareAlphabet(square);
         let number, newNumber;
-        number = newNumber = chess.activeSquareNumber;
+        number = newNumber = chess.getSquareNumber(square);
 
         let squares = [];
 
@@ -222,15 +98,19 @@ class Pawn extends Peace {
         squares.forEach((square, index) => {
             if (chess.getPeace(square) instanceof Peace) {
                 sliceEnd = index;
-
-                return false;
             }
         });
 
         // slice occupied squares.
         squares = squares.slice(0, sliceEnd);
 
-        return squares.concat(this.getCaptureSquares(chess));
+        if (sort) {
+            squares = arrayChunk(this.getCaptureSquares(chess, square), 1);
+        } else {
+            squares = squares.concat(this.getCaptureSquares(chess, square));
+        }
+
+        return squares;
     }
 
     /**
@@ -243,9 +123,9 @@ class Pawn extends Peace {
         let squares = [];
 
         let squareKeys = chess.getSquares();
-        let squareKey = chess.getSquaresArrayKey();
+        let squareKey = chess.getSquaresArrayKey(this.getSquare());
 
-        let captureSquareNumber = chess.activeSquareNumber;
+        let captureSquareNumber = chess.getSquareNumber(this.getSquare());
 
         if (this.side === 'white') {
             captureSquareNumber++;
@@ -299,5 +179,136 @@ class Pawn extends Peace {
      */
     getNewKey(isIncrement, key, number) {
         return isIncrement ? key + number : key - number;
+    }
+
+    /**
+     * Take en passant peace.
+     *
+     * @param chess object
+     */
+    takesEnPassantPeace(chess) {
+        if (! (this.enPassant.pawn instanceof Pawn)
+            || chess.getSquareAlphabet(this.enPassant.activeSquare) !== chess.getSquareAlphabet(this.getSquare())
+        ) {
+            return false;
+        }
+
+        chess.squares[this.enPassant.activeSquare] = [];
+
+        chess.capturePeaceElement(
+            this.enPassant.pawn,
+            document.getElementById(this.enPassant.activeSquare),
+            false
+        )
+
+        enPassant.clear();
+
+        return true;
+    }
+
+    /**
+     * Set self as en passant for another same peace.
+     *
+     * @param chess object
+     */
+    setsEnPassantPeace(chess) {
+        let targetSquareNumber = chess.getSquareNumber(this.getSquare());
+
+        if (! ([4, 5].includes(targetSquareNumber))
+            || chess.availableSquares.length < 2
+        ) {
+            return false;
+        }
+
+        let squares = chess.availableSquares;
+
+        let targetSquareKey = chess.getSquaresArrayKey(this.getSquare());
+
+        let sideSquare1 = chess.getSquare(
+            this.side === 'white' ? targetSquareKey - 1 : targetSquareKey + 1
+        );
+        let sideSquare2 = chess.getSquare(
+            this.side === 'white' ? targetSquareKey + 1 : targetSquareKey - 1
+        );
+
+        if (chess.getSquareNumber(sideSquare1) === targetSquareNumber) {
+            squares.push(sideSquare1);
+        }
+
+        if (chess.getSquareNumber(sideSquare2) === targetSquareNumber) {
+            squares.push(sideSquare2);
+        }
+
+        let captureSquare = chess.activeSquare;
+
+        squares.forEach(square => {
+            let peace = chess.getPeace(square);
+
+            // set self as en passant for another same peace.
+            if (peace instanceof Pawn && ! Object.is(this, peace)) {
+                if (targetSquareNumber === chess.getSquareNumber(square)) {
+                    captureSquare = chess.availableSquares[0];
+                }
+
+                peace.enPassant.pawn = this;
+                peace.enPassant.activeSquare = this.getSquare();
+                peace.enPassant.captureSquare = captureSquare;
+
+                enPassant.set(peace);
+            }
+        });
+
+        return true;
+    }
+
+    /**
+     * Create a promotion peaces element.
+     *
+     * @param chess object
+     * @return HTMLDivElement
+     */
+    createPromotionPeacesElement(chess) {
+        const promElement = document.createElement('div');
+
+        promElement.setAttribute('id', 'promotion');
+        promElement.setAttribute('data-prom-square', this.getSquare());
+
+        let peaceNames = pawnPromotion.getPeaceNames();
+
+        const promSquareElement = document.getElementById(this.getSquare());
+        let psRect = promSquareElement.getBoundingClientRect();
+
+        if (chess.side !== this.side) {
+            peaceNames.reverse();
+        }
+
+        peaceNames.forEach(name => {
+            const peaceElement = document.createElement('div');
+            peaceElement.setAttribute('class', 'peace');
+            peaceElement.setAttribute('data-prom-peace', name);
+
+            promElement.appendChild(peaceElement);
+        });
+
+        promElement.querySelectorAll('.peace').forEach(peaceElement => {
+            let peaceName = peaceElement.getAttribute('data-prom-peace');
+
+            let peaceFile = chess.getPeaceFileByOrder(
+                pawnPromotion.getPeaces(this.side)[peaceName].getFile()
+            );
+
+            peaceElement.setAttribute('data-file', peaceFile)
+        });
+
+        chess.setBoardBgVisibility(1);
+
+        document.getElementById(chess.boardElementName).before(promElement);
+
+        promElement.style.top = psRect.top + 'px';
+        promElement.style.left = psRect.left + 'px';
+
+        if (chess.side !== this.side) {
+            promElement.style.top = (psRect.bottom - promElement.clientHeight) + 'px';
+        }
     }
 }

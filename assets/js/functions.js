@@ -4,11 +4,13 @@
  * @param chess object
  * @param distance integer
  * @param side string
+ * @param square string
+ * @param sort boolean
  * @return array
  */
-const defineDiagonalSquares = (chess, distance, side) => {
+const defineDiagonalSquares = (chess, distance, side, square, sort = false) => {
     let squares = chess.getSquares();
-    let squareKey = chess.getSquaresArrayKey();
+    let squareKey = chess.getSquaresArrayKey(square);
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
@@ -19,11 +21,15 @@ const defineDiagonalSquares = (chess, distance, side) => {
         newSquareKey => {return newSquareKey + 9;}
     ];
 
-    moveFunctions.forEach(moveObject => {
+    moveFunctions.forEach((moveFunction, line) => {
         let newSquareKey = squareKey;
 
+        if (sort) {
+            newSquares[line] = [];
+        }
+
         for (let i = 1; i <= distance; i++) {
-            newSquareKey = moveObject(newSquareKey);
+            newSquareKey = moveFunction(newSquareKey);
 
             let targetSquare = squares[newSquareKey];
 
@@ -39,14 +45,19 @@ const defineDiagonalSquares = (chess, distance, side) => {
                     break;
                 }
 
-                newSquares.push(targetSquare);
+                if (sort) {
+                    newSquares[line].push(targetSquare);
+                } else {
+                    newSquares.push(targetSquare);
+                }
 
-                let targetSquarePeace = chess.getPeace(targetSquare);
+                let targetPeace = chess.getPeace(targetSquare);
 
-                // if target square contains a same side peace
-                if (targetSquarePeace instanceof Peace) {
-                    if (targetSquarePeace.side === side) {
-                        newSquares.pop();
+                // if target square contains a peace
+                if (targetPeace instanceof Peace) {
+                    // if same side peace
+                    if (targetPeace.side === side) {
+                        sort ? newSquares[line].pop() : newSquares.pop();
                     }
 
                     break;
@@ -69,11 +80,13 @@ const defineDiagonalSquares = (chess, distance, side) => {
  * @param chess object
  * @param distance integer
  * @param side string
+ * @param square string
+ * @param sort boolean
  * @return array
  */
-const defineLinearSquares = (chess, distance, side) => {
+const defineLinearSquares = (chess, distance, side, square, sort = false) => {
     let squares = chess.getSquares();
-    let squareKey = chess.getSquaresArrayKey();
+    let squareKey = chess.getSquaresArrayKey(square);
     let currentSquareAlphabet = chess.getSquareAlphabet(squares[squareKey]);
 
     let newSquares = [];
@@ -84,11 +97,15 @@ const defineLinearSquares = (chess, distance, side) => {
         newSquareKey => {return newSquareKey + 8;}
     ];
 
-    moveFunctions.forEach(moveObject => {
+    moveFunctions.forEach((moveFunction, line) => {
         let newSquareKey = squareKey;
 
+        if (sort) {
+            newSquares[line] = [];
+        }
+
         for (let i = 1; i <= distance; i++) {
-            newSquareKey = moveObject(newSquareKey);
+            newSquareKey = moveFunction(newSquareKey);
 
             let targetSquare = squares[newSquareKey];
 
@@ -107,14 +124,19 @@ const defineLinearSquares = (chess, distance, side) => {
                     break;
                 }
 
-                newSquares.push(targetSquare);
+                if (sort) {
+                    newSquares[line].push(targetSquare);
+                } else {
+                    newSquares.push(targetSquare);
+                }
 
-                let targetSquarePeace = chess.getPeace(targetSquare);
+                let targetPeace = chess.getPeace(targetSquare);
 
-                // if the target square contains a same side peace
-                if (targetSquarePeace instanceof Peace) {
-                    if (targetSquarePeace.side === side) {
-                        newSquares.pop();
+                // if target square contains a peace
+                if (targetPeace instanceof Peace) {
+                    // if same side peace
+                    if (targetPeace.side === side) {
+                        sort ? newSquares[line].pop() : newSquares.pop();
                     }
 
                     break;
@@ -131,4 +153,23 @@ const defineLinearSquares = (chess, distance, side) => {
     });
 
     return newSquares;
+}
+
+/**
+ * Split the array into even chunks.
+ *
+ * @param array
+ * @param size
+ * @return array
+ */
+function arrayChunk(array, size) {
+    const result = [];
+
+    for (let i = 0; i < array.length; i += size) {
+        const chunk = array.slice(i, i + size);
+
+        result.push(chunk);
+    }
+
+    return result;
 }

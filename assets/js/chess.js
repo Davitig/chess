@@ -17,25 +17,25 @@ class Chess {
         c8: new Bishop('black'),
         d8: new Queen('black'),
         e8: new King('black'),
-        f8: new Bishop('black'),
+        f8: [],
         g8: new Knight('black'),
         h8: new Rook('black'),
         a7: new Pawn('black'),
         b7: new Pawn('black'),
         c7: new Pawn('black'),
         d7: new Pawn('black'),
-        e7: new Pawn('black'),
+        e7: [],
         f7: new Pawn('black'),
         g7: new Pawn('black'),
         h7: new Pawn('black'),
         a6: [], b6: [], c6: [], d6: [], e6: [], f6: [], g6: [], h6: [],
-        a5: [], b5: [], c5: [], d5: [], e5: [], f5: [], g5: [], h5: [],
-        a4: [], b4: [], c4: [], d4: [], e4: [], f4: [], g4: [], h4: [],
-        a3: [], b3: [], c3: [], d3: [], e3: [], f3: [], g3: [], h3: [],
+        a5: [], b5: [], c5: new Bishop('black'), d5: [], e5: new Pawn('black'), f5: [], g5: [], h5: [],
+        a4: [], b4: [], c4: [], d4: new Pawn('white'), e4: [], f4: [], g4: [], h4: [],
+        a3: [], b3: [], c3: [], d3: [], e3: new King('white'), f3: [], g3: [], h3: [],
         a2: new Pawn('white'),
         b2: new Pawn('white'),
         c2: new Pawn('white'),
-        d2: new Pawn('white'),
+        d2: [],
         e2: new Pawn('white'),
         f2: new Pawn('white'),
         g2: new Pawn('white'),
@@ -44,7 +44,7 @@ class Chess {
         b1: new Knight('white'),
         c1: new Bishop('white'),
         d1: new Queen('white'),
-        e1: new King('white'),
+        e1: [],
         f1: new Bishop('white'),
         g1: new Knight('white'),
         h1: new Rook('white')
@@ -63,6 +63,20 @@ class Chess {
      * @type string
      */
     side;
+
+    /**
+     * Indicates a previous side move.
+     *
+     * @type string
+     */
+    prevSideMove = "black";
+
+    /**
+     * Indicates whether moves goes by order.
+     *
+     * @type string
+     */
+    moveByOrder;
 
     /**
      * Active square.
@@ -105,13 +119,16 @@ class Chess {
      *
      * @param name string
      * @param side string
+     * @param moveByOrder boolean
      */
-    constructor(name, side) {
+    constructor(name, side, moveByOrder = true) {
         this.boardElementName = name;
 
         this.squareKeys = Object.keys(this.squares);
 
         this.side = side;
+
+        this.moveByOrder = moveByOrder;
     }
 
     /**
@@ -134,13 +151,31 @@ class Chess {
     }
 
     /**
-     * Get a peace from the squares.
+     * Get the active square.
+     *
+     * @return array
+     */
+    getActiveSquare() {
+        return this.activeSquare;
+    }
+
+    /**
+     * Get the peaces from the squares.
+     *
+     * @return object
+     */
+    getPeaces() {
+        return Object.values(this.squares);
+    }
+
+    /**
+     * Get the peace from the squares.
      *
      * @param square string
      * @return object
      */
     getPeace(square) {
-        return this.squares[square];
+        return square ? this.squares[square] : this.getActivePeace();
     }
 
     /**
@@ -218,17 +253,25 @@ class Chess {
      * Add peace into the square.
      *
      * @param peace object
-     * @param squareElement object
+     * @param square HTMLElement|string
      * @return boolean
      */
-    addPeace(peace, squareElement) {
-        let square = squareElement.getAttribute('data-square');
+    addPeace(peace, square) {
+        let squareElement = square;
+
+        if (typeof square === 'object') {
+            square = squareElement.getAttribute('data-square');
+        } else {
+            squareElement = document.getElementById(square);
+        }
 
         if (! (peace instanceof Peace) || ! square) {
             return false;
         }
 
         this.squares[square] = peace;
+
+        peace.setSquare(square);
 
         let peaceFile = this.getPeaceFileByOrder(peace.getFile());
 
@@ -271,19 +314,29 @@ class Chess {
      * On peace click.
      *
      * @param squareElement object
+     * @return boolean
      */
     onPeaceClick(squareElement) {
+        // if peace square is available it's a capture
         if (squareElement.getAttribute('data-available') === '1') {
+            // if the king square is on check: do not take it
+            if (squareElement.getAttribute('data-check') === '1') {
+                return true;
+            }
+
             this.onAvailableSquareClick(squareElement);
 
-            return false;
+            return true;
         }
 
         let square = squareElement.getAttribute('data-square');
 
+        // make available moves for the peace
         if (this.setActiveSquare(square, squareElement)) {
-            this.setAvailableSquares(square);
+            this.setAvailableSquares();
         }
+
+        return true;
     }
 
     /**
@@ -295,10 +348,41 @@ class Chess {
         let targetSquare = targetSquareElement.getAttribute('data-square');
 
         if (this.activeSquare !== undefined && this.availableSquares.includes(targetSquare)) {
+            this.unsetKingSquareCheck();
+
             this.takeSquare(targetSquare, targetSquareElement);
         }
 
         this.unsetSquares();
+    }
+
+    /**
+     * Take the square.
+     *
+     * @param targetSquare string
+     * @param targetSquareElement object|undefined
+     * @return boolean
+     */
+    takeSquare(targetSquare, targetSquareElement) {
+        let activePeace = this.getActivePeace();
+        let targetPeace = this.getPeace(targetSquare);
+
+        if (targetPeace instanceof King) {
+            return false;
+        }
+
+        this.squares[this.activeSquare] = [];
+        this.squares[targetSquare] = activePeace;
+
+        activePeace.setSquare(targetSquare);
+
+        this.prevSideMove = activePeace.side;
+
+        activePeace.onTakeSquare(this);
+
+        this.capturePeaceElement(targetPeace, targetSquareElement)
+
+        return true;
     }
 
     /**
@@ -323,27 +407,6 @@ class Chess {
     }
 
     /**
-     * Take the square.
-     *
-     * @param targetSquare string
-     * @param targetSquareElement object|undefined
-     * @return boolean
-     */
-    takeSquare(targetSquare, targetSquareElement) {
-        let activePeace = this.getActivePeace();
-        let targetPeace = this.getPeace(targetSquare);
-
-        this.squares[this.activeSquare] = [];
-        this.squares[targetSquare] = activePeace;
-
-        activePeace.onTakeSquare(this, targetSquare);
-
-        this.capturePeaceElement(targetPeace, targetSquareElement)
-
-        return true;
-    }
-
-    /**
      * Set active square.
      *
      * @param square string
@@ -351,6 +414,11 @@ class Chess {
      * @return boolean
      */
     setActiveSquare(square, squareElement) {
+        // if the move order is enabled and trying to activate a same side peace
+        if (this.moveByOrder && this.prevSideMove === this.getPeace(square).side) {
+            return false;
+        }
+
         // if peace switch
         if (this.activeSquare && this.activeSquare !== square) {
             this.unsetActiveSquare();
@@ -375,14 +443,17 @@ class Chess {
     /**
      * Set available squares.
      *
-     * @param square string
      * @return boolean
      */
-    setAvailableSquares(square) {
-        let squares = this.getPeace(square).defineMoves(this);
+    setAvailableSquares() {
+        let peace = this.getActivePeace();
+
+        let squares = peace.defineMoves(this);
 
         // if toggle click
-        if (! squares.length || squares.every((el, index) => el === this.availableSquares[index])) {
+        if (! squares.length
+            || squares.every((el, index) => el === this.availableSquares[index])
+        ) {
             this.unsetAvailableSquares();
 
             return false;
@@ -392,13 +463,76 @@ class Chess {
 
         this.availableSquares = squares;
 
-        squares.forEach(square => {
+        this.intersectAvailableAndCheckerSquares()
+
+        this.availableSquares.forEach(square => {
             const squareElement = document.getElementById(square);
 
             squareElement.setAttribute('data-available', 1);
         });
 
         return true;
+    }
+
+    /**
+     * If king is on the check then leave only the king cover squares.
+     *
+     * @return boolean
+     */
+    intersectAvailableAndCheckerSquares() {
+        let checkerPeaces = this.imitateCheck();
+
+        if (! checkerPeaces.length) {
+            return false;
+        }
+
+        // if king check then remove all available squares rather than king cover squares
+        for (let i = 0; i < checkerPeaces.length; i++) {
+            this.availableSquares = this.availableSquares.filter(square => {
+                return square === checkerPeaces[i].checkerPeace.getSquare()
+                    || (checkerPeaces[i].checkerSquares.includes(square)
+                        && ! (checkerPeaces[i].checkerPeace instanceof Knight)
+                    )
+            });
+        }
+
+        return true;
+    }
+
+    /**
+     * Imitate king check from every peace.
+     *
+     * @return array
+     */
+    imitateCheck() {
+        let squares = this.getSquares();
+        let checkerPeaces = [];
+
+        let activeSquare = this.getActiveSquare();
+        let activePeace = this.getActivePeace();
+
+        if (! (activePeace instanceof King)) {
+            // temporarily unset the active peace from the squares
+            this.squares[activeSquare] = [];
+        }
+
+        // imitate check from every peace
+        squares.forEach(square => {
+            let peace = this.getPeace(square);
+
+            if (peace instanceof Peace && peace.side !== this.side) {
+                let checkObj = peace.check(this, peace, square);
+
+                if (checkObj.length && checkObj[0].kingSquare) {
+                    checkerPeaces.push(checkObj[0]);
+                }
+            }
+        });
+
+        // set back the original squares
+        this.squares[activeSquare] = activePeace;
+
+        return checkerPeaces;
     }
 
     /**
@@ -431,6 +565,17 @@ class Chess {
         document.querySelectorAll('[data-available="1"]').forEach(el => {
             el.setAttribute('data-available', 0);
         });
+    }
+
+    /**
+     * Unset king square check.
+     */
+    unsetKingSquareCheck() {
+        let kingSquare = document.querySelector('[data-check="1"]');
+
+        if (kingSquare) {
+            kingSquare.setAttribute('data-check', 0);
+        }
     }
 
     /**
@@ -498,7 +643,7 @@ class Chess {
      * @param value integer
      */
     setBoardBgVisibility(value) {
-        const chessBoardBg = document.querySelector('#chessboard-bg');
+        const chessBoardBg = document.getElementById('chessboard-bg');
 
         chessBoardBg.setAttribute('data-visible', parseInt(value));
         chessBoardBg.style.height = document.body.clientHeight + 'px';

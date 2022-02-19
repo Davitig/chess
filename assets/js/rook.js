@@ -25,22 +25,42 @@ class Rook extends Peace {
     }
 
     /**
+     * Invoke on take square.
+     *
+     * @param chess object
+     */
+    onTakeSquare(chess) {
+        // make the king check action
+        this.checkAction(chess, chess.getPeaces().filter(peace => {
+            return peace instanceof Peace
+                && peace.side === this.side
+                && ! (peace instanceof King)
+                && (peace instanceof Queen
+                    || peace instanceof Bishop
+                    || Object.is(this, peace)
+                )
+        }));
+    }
+
+    /**
      * Define squares for the peace.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    defineMoves(chess) {
-        return this.getMovableSquares(chess);
+    defineMoves(chess, sort = false) {
+        return this.getMovableSquares(chess, sort);
     }
 
     /**
      * Get movable squares.
      *
      * @param chess object
+     * @param sort boolean
      * @return array
      */
-    getMovableSquares(chess) {
-        return defineLinearSquares(chess, 7, this.side);
+    getMovableSquares(chess, sort = false) {
+        return defineLinearSquares(chess, 7, this.side, this.getSquare(), sort);
     }
 }
