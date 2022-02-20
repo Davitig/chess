@@ -64,9 +64,10 @@ class Peace {
      *
      * @param chess object
      * @param peaces array
+     * @param enableEvent boolean
      * @return string
      */
-    check(chess, peaces) {
+    check(chess, peaces, enableEvent = true) {
         let availableSquares = [];
         let peacesList = [];
         let checkerPeaces = [];
@@ -101,6 +102,10 @@ class Peace {
                     });
                 }
             });
+        }
+
+        if (enableEvent && checkerPeaces.length) {
+            chess.events.onCheck(checkerPeaces);
         }
 
         return checkerPeaces;

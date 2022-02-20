@@ -387,6 +387,8 @@ class Chess {
 
         this.prevSideMove = activePeace.side;
 
+        chess.events.onTakeSquare(targetSquare, targetPeace);
+
         activePeace.onTakeSquare(this);
 
         this.capturePeaceElement(targetPeace, targetSquareElement)
@@ -403,14 +405,18 @@ class Chess {
         let peaceName = peaceElement.getAttribute('data-prom-peace');
         let promSquare = peaceElement.parentNode.getAttribute('data-prom-square');
 
+        let peace = this.getPeace(promSquare);
+
         chess.addPeace(
-            pawnPromotion.getPeaces(this.getPeace(promSquare).side)[peaceName],
+            pawnPromotion.getPeaces(peace.side)[peaceName],
             document.querySelector(
                 '#' + peaceElement.parentNode.getAttribute('data-prom-square')
             )
         );
 
         this.setBoardBgVisibility(0)
+
+        chess.events.onPawnPromotion(peace, promSquare);
 
         document.getElementById('promotion').remove();
     }
@@ -542,7 +548,7 @@ class Chess {
                 && peace.side !== activePeace.side
                 && ! (peace instanceof King)
             ) {
-                let checkObj = peace.check(this, peace, square);
+                let checkObj = peace.check(this, peace, false);
 
                 if (checkObj.length && checkObj[0].kingSquare) {
                     checkerPeaces.push(checkObj[0]);

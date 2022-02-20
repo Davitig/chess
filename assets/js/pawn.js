@@ -52,7 +52,7 @@ class Pawn extends Peace {
 
         let targetSquareNumber = chess.getSquareNumber(this.getSquare());
 
-        // promote a peace if the pawn get to the last row square
+        // promote a peace if the pawn is on the last row square
         if ([1, 8].includes(targetSquareNumber)) {
             this.createPromotionPeacesElement(chess);
         }
