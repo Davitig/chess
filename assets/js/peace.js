@@ -95,9 +95,9 @@ class Peace {
 
                 if (targetPeace instanceof King && targetPeace.side !== peaces[i].side) {
                     checkerPeaces.push({
-                        kingSquare: targetPeace.getSquare(),
                         checkerPeace: peaces[i],
-                        checkerSquares: availableSquares[i]
+                        checkerSquares: availableSquares[i],
+                        kingSquare: targetPeace.getSquare()
                     });
                 }
             });
@@ -126,6 +126,10 @@ class Peace {
             return false;
         }
 
+        if (this.isCheckmate(chess, checkerPeaces)) {
+            chess.events.onCheckmate(this);
+        }
+
         kingSquareElement = document.getElementById(checkerPeaces[0].kingSquare);
 
         if (kingSquareElement) {
@@ -133,5 +137,43 @@ class Peace {
         }
 
         return true;
+    }
+
+    /**
+     * Determine checkmate.
+     *
+     * @param chess object
+     * @param checkerPeaces array
+     * @return boolean
+     */
+    isCheckmate(chess, checkerPeaces) {
+        if (! checkerPeaces.length) {
+            return false;
+        }
+
+        return ! chess.getPeaces().filter(peace => {
+            if (! (peace instanceof Peace) || peace.side === this.side) {
+                return false;
+            }
+
+            let squareLength = 0;
+
+            if (peace instanceof King) {
+                peace.safeMode = true;
+
+                squareLength = peace.defineMoves(chess).length;
+
+                peace.safeMode = false;
+            } else {
+                checkerPeaces.forEach(checkerObj => {
+                    squareLength = peace.defineMoves(chess).filter(square => {
+                        return square === checkerObj.checkerPeace.getSquare()
+                            || checkerObj.checkerSquares.includes(square);
+                    }).length;
+                });
+            }
+
+            return squareLength;
+        }).length
     }
 }

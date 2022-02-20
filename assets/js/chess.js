@@ -115,6 +115,13 @@ class Chess {
     peaceLooks = 'right';
 
     /**
+     * Events.
+     *
+     * @type object
+     */
+    events;
+
+    /**
      * Create a new board.
      *
      * @param name string
@@ -129,6 +136,8 @@ class Chess {
         this.side = side;
 
         this.moveByOrder = moveByOrder;
+
+        this.events = new ChessEvents;
     }
 
     /**
@@ -229,7 +238,7 @@ class Chess {
             this.side === 'white' ? 'black' : 'white', 'self'
         ));
 
-        // draw the board with its peaces
+        // draw the board with its predefined starting peaces
         this.squareKeys.forEach((square, index) => {
             const squareElement = document.createElement('div');
             squareElement.setAttribute('id', square);
