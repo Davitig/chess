@@ -7,6 +7,13 @@ class Queen extends Peace {
     name = "queen"
 
     /**
+     * Point of the peace.
+     *
+     * @type number
+     */
+    point = 9;
+
+    /**
      * The actual white peace file (see assets -> images).
      *
      * @type object

@@ -7,6 +7,13 @@ class Bishop extends Peace {
     name = "bishop"
 
     /**
+     * Point of the peace.
+     *
+     * @type number
+     */
+    point = 3;
+
+    /**
      * The actual white peace file (see assets -> images).
      *
      * @type object

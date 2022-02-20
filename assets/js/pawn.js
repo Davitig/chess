@@ -7,6 +7,13 @@ class Pawn extends Peace {
     name = "pawn"
 
     /**
+     * Point of the peace.
+     *
+     * @type number
+     */
+    point = 1;
+
+    /**
      * The actual white peace file (see assets -> images).
      *
      * @type object

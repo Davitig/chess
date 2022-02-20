@@ -171,7 +171,7 @@ class Chess {
     /**
      * Get the peaces from the squares.
      *
-     * @return object
+     * @return array
      */
     getPeaces() {
         return Object.values(this.squares);
@@ -391,6 +391,10 @@ class Chess {
 
         activePeace.onTakeSquare(this);
 
+        if (targetPeace instanceof Peace) {
+            this.updatePointsDiff();
+        }
+
         this.capturePeaceElement(targetPeace, targetSquareElement)
 
         return true;
@@ -606,6 +610,35 @@ class Chess {
     }
 
     /**
+     * Update the difference of the captured peaces points.
+     */
+    updatePointsDiff() {
+        const whitePointElement = document.querySelector('#captured-white .point');
+        const blackPointElement = document.querySelector('#captured-black .point');
+
+        let whitePoint = 0;
+        let blackPoint = 0;
+
+        this.getPeaces().filter(
+            peace => peace instanceof Peace && peace.side === 'white'
+        ).forEach(peace => {
+            whitePoint += peace.point;
+        });
+
+        this.getPeaces().filter(
+            peace => peace instanceof Peace && peace.side === 'black'
+        ).forEach(peace => {
+            blackPoint += peace.point;
+        });
+
+        let whitePointDiff = (blackPoint - whitePoint);
+        let blackPointDiff = (whitePoint - blackPoint);
+
+        whitePointElement.textContent = (Math.max(whitePointDiff, 0) ? '+' + whitePointDiff : '');
+        blackPointElement.textContent = (Math.max(blackPointDiff, 0) ? '+' + blackPointDiff : '');
+    }
+
+    /**
      * Capture the peace element with an active one.
      *
      * @param targetPeace object
@@ -660,6 +693,12 @@ class Chess {
 
             element.appendChild(peaceElement);
         });
+
+        const pointElement = document.createElement('div');
+
+        pointElement.setAttribute('class', 'peaces point');
+
+        sideDef === 'self' ? element.prepend(pointElement) : element.appendChild(pointElement);
 
         return element;
     }

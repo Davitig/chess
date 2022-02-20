@@ -31,6 +31,7 @@ html, body {margin: 0; padding: 0;}
 .captured-peaces.self {padding-top: 5px; text-align: right;}
 .captured-peaces {width: 100%; height: 30px;}
 .captured-peaces .peaces {display: inline-block;}
-.captured-peaces .peace {width: 30px; height: 30px; display: inline-block; cursor: default; background-size: auto 30px;}
+.captured-peaces .peace {width: 20px; height: 20px; display: inline-block; cursor: default; background-size: auto 20px;}
 #promotion {width: 90px; position: absolute; top: 0; left: 0; z-index: 2;}
+.captured-peaces .point {padding:0 2px;}
 .prom-peace {display: inline-block;}

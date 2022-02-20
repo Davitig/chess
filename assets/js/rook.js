@@ -7,6 +7,13 @@ class Rook extends Peace {
     name = "rook"
 
     /**
+     * Point of the peace.
+     *
+     * @type number
+     */
+    point = 5;
+
+    /**
      * The actual white peace file (see assets -> images).
      *
      * @type object

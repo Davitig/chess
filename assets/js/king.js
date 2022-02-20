@@ -7,6 +7,13 @@ class King extends Peace {
     name = "king"
 
     /**
+     * Point of the peace.
+     *
+     * @type number
+     */
+    point = 0;
+
+    /**
      * Safe mode used to avoid correlation between kings during defining moves.
      *
      * @type boolean
