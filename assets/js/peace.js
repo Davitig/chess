@@ -7,7 +7,7 @@ class Peace {
     side;
 
     /**
-     * Peace current square.
+     * The current square.
      *
      * @type string
      */
@@ -105,7 +105,7 @@ class Peace {
         }
 
         if (enableEvent && checkerPeaces.length) {
-            chess.events.onCheck(checkerPeaces);
+            chess.event.onCheck(checkerPeaces);
         }
 
         return checkerPeaces;
@@ -132,7 +132,7 @@ class Peace {
         }
 
         if (this.isCheckmate(chess, checkerPeaces)) {
-            chess.events.onCheckmate(this);
+            chess.event.onCheckmate(this);
         }
 
         kingSquareElement = document.getElementById(checkerPeaces[0].kingSquare);

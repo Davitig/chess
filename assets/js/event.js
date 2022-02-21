@@ -1,4 +1,4 @@
-class ChessEvents {
+class ChessEvent {
     /**
      * On checkmate.
      *

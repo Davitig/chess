@@ -19,7 +19,8 @@
 <script src="assets/js/peace.js"></script>
 <script src="assets/js/prototypes.js"></script>
 <script src="assets/js/functions.js"></script>
-<script src="assets/js/events.js"></script>
+<script src="assets/js/event.js"></script>
+<script src="assets/js/timer.js"></script>
 <script src="assets/js/king.js"></script>
 <script src="assets/js/queen.js"></script>
 <script src="assets/js/bishop.js"></script>
@@ -27,17 +28,17 @@
 <script src="assets/js/rook.js"></script>
 <script src="assets/js/pawn.js"></script>
 <script type="text/javascript">
-    let chess = new Chess('board', 'white', false);
+    let chess = new Chess('board', 'white', true);
 
     chess.createBoard();
 
-    chess.setTimer(60 * 3, 15);
+    chess.timer.set(60 * 3, 15);
 
-    chess.events.onCheckmate = peace => {
+    chess.event.onCheckmate = peace => {
         console.log(chess.side === peace.side ? 'You won' : 'You lost');
     };
 
-    chess.events.onTimeout = side => {
+    chess.event.onTimeout = side => {
         console.log(side + ' won');
     }
 </script>

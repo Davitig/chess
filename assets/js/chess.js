@@ -115,29 +115,18 @@ class Chess {
     peaceLooks = 'right';
 
     /**
-     * Events.
+     * The events instance.
      *
-     * @type object
+     * @type ChessEvent
      */
-    events;
+    event;
 
     /**
-     * Contains the active timer data (setInterval ID, etc).
-     * Timer won't work if the move by order is disabled.
+     * The timer instance.
      *
-     * @type object
+     * @type ChessTimer
      */
-    timer = {
-        white: {duration: 0, timerId: undefined},
-        black: {duration: 0, timerId: undefined}
-    };
-
-    /**
-     * Timer duration increment, in milliseconds.
-     *
-     * @type number
-     */
-    timerDurationIncrement = 0;
+    timer;
 
     /**
      * Create a new board.
@@ -155,7 +144,9 @@ class Chess {
 
         this.moveByOrder = moveByOrder;
 
-        this.events = new ChessEvents;
+        this.event = new ChessEvent;
+
+        this.timer = new ChessTimer;
     }
 
     /**
@@ -228,126 +219,6 @@ class Chess {
         }
 
         return file;
-    }
-
-    /**
-     * Set the duration of the game, in milliseconds.
-     *
-     * @param duration number
-     * @param increment number
-     */
-    setTimer(duration, increment) {
-        this.timer['white'].duration = duration;
-        this.timer['black'].duration = duration;
-
-        this.timerDurationIncrement = increment;
-
-        const whiteTimerElement = document.getElementById('white-timer');
-        const blackTimerElement = document.getElementById('black-timer');
-
-        whiteTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
-        blackTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
-    }
-
-    /**
-     * Start the timer.
-     *
-     * @param side string
-     */
-    startTimer(side) {
-        const element = document.getElementById(side + '-timer');
-
-        let oppositeSide = (side === 'white' ? 'black' : 'white');
-
-        let duration = this.timer[side].duration - 1;
-
-        let timerId = setInterval(() => {
-            element.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
-
-            if (--duration < 0) {
-                stopTimer();
-
-                this.events.onTimeout(oppositeSide);
-            }
-
-            this.timer[side].duration = duration;
-        }, 1000);
-
-        this.timer[side].timerId = timerId;
-
-        let stopTimer = this.stopTimer(timerId);
-
-        this.incrementTimer(oppositeSide);
-
-        this.stopTimer(this.timer[oppositeSide].timerId)();
-    }
-
-    /**
-     * Increment the timer duration.
-     *
-     * @param side string
-     * @return boolean
-     */
-    incrementTimer(side) {
-        if (! this.timer[side].timerId) {
-            return false;
-        }
-
-        this.timer[side].duration += this.timerDurationIncrement + 1;
-
-        document.getElementById(side + '-timer').textContent = (
-            this.getMinutes(this.timer[side].duration)
-            + ':' +
-            this.getSeconds(this.timer[side].duration)
-        );
-
-        return true;
-    }
-
-    /**
-     * Stop the timer.
-     *
-     * @param timerId setInterval ID
-     * @return function
-     */
-    stopTimer(timerId) {
-        return () => {
-            clearInterval(timerId);
-        }
-    }
-
-    /**
-     * Get a minutes from the duration time.
-     *
-     * @param duration number
-     * @param appendZero boolean
-     * @return string
-     */
-    getMinutes(duration, appendZero = true) {
-        let minutes = parseInt(duration / 60, 10);
-
-        if (appendZero) {
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-        }
-
-        return minutes;
-    }
-
-    /**
-     * Get a seconds from the duration time.
-     *
-     * @param duration number
-     * @param appendZero boolean
-     * @return string
-     */
-    getSeconds(duration, appendZero = true) {
-        let minutes = parseInt(duration % 60, 10);
-
-        if (appendZero) {
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-        }
-
-        return minutes;
     }
 
     /**
@@ -526,17 +397,17 @@ class Chess {
 
         activePeace.setSquare(targetSquare);
 
-        if (! this.moveByOrder) {
+        if (this.moveByOrder) {
             if (activePeace.side === 'white') {
-                this.startTimer('black');
+                this.timer.start(this, 'black');
             } else {
-                this.startTimer('white');
+                this.timer.start(this, 'white');
             }
         }
 
         this.prevSideMove = activePeace.side;
 
-        chess.events.onTakeSquare(targetPeace, targetSquare);
+        chess.event.onTakeSquare(targetPeace, targetSquare);
 
         activePeace.onTakeSquare(this);
 
@@ -569,7 +440,7 @@ class Chess {
 
         this.setBoardBgVisibility(0)
 
-        chess.events.onPawnPromotion(peace, promSquare);
+        chess.event.onPawnPromotion(peace, promSquare);
 
         document.getElementById('promotion').remove();
     }
