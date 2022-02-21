@@ -10,7 +10,9 @@
 </head>
 <body>
 <div class="container">
-    <div id="board" class="clearfix"></div>
+    <div id="chess">
+        <div id="board" class="clearfix"></div>
+    </div>
 </div>
 <!-- JS -->
 <script src="assets/js/chess.js"></script>
@@ -29,9 +31,15 @@
 
     chess.createBoard();
 
+    chess.setTimer(60 * 3, 15);
+
     chess.events.onCheckmate = peace => {
         console.log(chess.side === peace.side ? 'You won' : 'You lost');
     };
+
+    chess.events.onTimeout = side => {
+        console.log(side + ' won');
+    }
 </script>
 </body>
 </html>

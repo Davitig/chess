@@ -122,6 +122,24 @@ class Chess {
     events;
 
     /**
+     * Contains the active timer data (setInterval ID, etc).
+     * Timer won't work if the move by order is disabled.
+     *
+     * @type object
+     */
+    timer = {
+        white: {duration: 0, timerId: undefined},
+        black: {duration: 0, timerId: undefined}
+    };
+
+    /**
+     * Timer duration increment, in milliseconds.
+     *
+     * @type number
+     */
+    timerDurationIncrement = 0;
+
+    /**
      * Create a new board.
      *
      * @param name string
@@ -213,6 +231,126 @@ class Chess {
     }
 
     /**
+     * Set the duration of the game, in milliseconds.
+     *
+     * @param duration number
+     * @param increment number
+     */
+    setTimer(duration, increment) {
+        this.timer['white'].duration = duration;
+        this.timer['black'].duration = duration;
+
+        this.timerDurationIncrement = increment;
+
+        const whiteTimerElement = document.getElementById('white-timer');
+        const blackTimerElement = document.getElementById('black-timer');
+
+        whiteTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+        blackTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+    }
+
+    /**
+     * Start the timer.
+     *
+     * @param side string
+     */
+    startTimer(side) {
+        const element = document.getElementById(side + '-timer');
+
+        let oppositeSide = (side === 'white' ? 'black' : 'white');
+
+        let duration = this.timer[side].duration - 1;
+
+        let timerId = setInterval(() => {
+            element.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+
+            if (--duration < 0) {
+                stopTimer();
+
+                this.events.onTimeout(oppositeSide);
+            }
+
+            this.timer[side].duration = duration;
+        }, 1000);
+
+        this.timer[side].timerId = timerId;
+
+        let stopTimer = this.stopTimer(timerId);
+
+        this.incrementTimer(oppositeSide);
+
+        this.stopTimer(this.timer[oppositeSide].timerId)();
+    }
+
+    /**
+     * Increment the timer duration.
+     *
+     * @param side string
+     * @return boolean
+     */
+    incrementTimer(side) {
+        if (! this.timer[side].timerId) {
+            return false;
+        }
+
+        this.timer[side].duration += this.timerDurationIncrement + 1;
+
+        document.getElementById(side + '-timer').textContent = (
+            this.getMinutes(this.timer[side].duration)
+            + ':' +
+            this.getSeconds(this.timer[side].duration)
+        );
+
+        return true;
+    }
+
+    /**
+     * Stop the timer.
+     *
+     * @param timerId setInterval ID
+     * @return function
+     */
+    stopTimer(timerId) {
+        return () => {
+            clearInterval(timerId);
+        }
+    }
+
+    /**
+     * Get a minutes from the duration time.
+     *
+     * @param duration number
+     * @param appendZero boolean
+     * @return string
+     */
+    getMinutes(duration, appendZero = true) {
+        let minutes = parseInt(duration / 60, 10);
+
+        if (appendZero) {
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+        }
+
+        return minutes;
+    }
+
+    /**
+     * Get a seconds from the duration time.
+     *
+     * @param duration number
+     * @param appendZero boolean
+     * @return string
+     */
+    getSeconds(duration, appendZero = true) {
+        let minutes = parseInt(duration % 60, 10);
+
+        if (appendZero) {
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+        }
+
+        return minutes;
+    }
+
+    /**
      * Create a new chess board.
      */
     createBoard() {
@@ -229,6 +367,9 @@ class Chess {
         // set necessary class names to the board element
         const boardElement = document.getElementById(this.boardElementName);
         boardElement.setAttribute('class', this.side + ' clearfix');
+
+        // create captured peaces element
+        boardElement.before(this.createTimerElement());
 
         // create captured peaces element
         boardElement.before(this.createCapturedPeacesElement(
@@ -385,9 +526,17 @@ class Chess {
 
         activePeace.setSquare(targetSquare);
 
+        if (! this.moveByOrder) {
+            if (activePeace.side === 'white') {
+                this.startTimer('black');
+            } else {
+                this.startTimer('white');
+            }
+        }
+
         this.prevSideMove = activePeace.side;
 
-        chess.events.onTakeSquare(targetSquare, targetPeace);
+        chess.events.onTakeSquare(targetPeace, targetSquare);
 
         activePeace.onTakeSquare(this);
 
@@ -699,6 +848,34 @@ class Chess {
         pointElement.setAttribute('class', 'peaces point');
 
         sideDef === 'self' ? element.prepend(pointElement) : element.appendChild(pointElement);
+
+        return element;
+    }
+
+    /**
+     * Create a timer element.
+     *
+     * @return HTMLDivElement
+     */
+    createTimerElement() {
+        const element = document.createElement('div');
+        element.setAttribute('id', 'chess-timer');
+
+        const whiteTimerElement = document.createElement('div');
+        whiteTimerElement.setAttribute('id', 'white-timer')
+        whiteTimerElement.setAttribute('class', 'chess-timer')
+        whiteTimerElement.textContent = '00:00';
+
+        const blackTimerElement = document.createElement('div');
+        blackTimerElement.setAttribute('id', 'black-timer')
+        blackTimerElement.setAttribute('class', 'chess-timer')
+        blackTimerElement.textContent = '00:00';
+
+        element.appendChild(whiteTimerElement);
+
+        this.side === 'white'
+            ? whiteTimerElement.before(blackTimerElement)
+            : whiteTimerElement.after(blackTimerElement)
 
         return element;
     }

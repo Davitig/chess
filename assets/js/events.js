@@ -4,22 +4,22 @@ class ChessEvents {
      *
      * @param checkerPeace object
      */
-    onCheckmate = function (checkerPeace) {}
+    onCheckmate = checkerPeace => {}
 
     /**
      * On take square.
      *
      * @param checkerPeaces array
      */
-    onCheck = function (checkerPeaces) {};
+    onCheck = checkerPeaces => {};
 
     /**
      * On take square.
      *
-     * @param square string
      * @param peace object|array
+     * @param square string
      */
-    onTakeSquare = function (square, peace) {};
+    onTakeSquare = (peace, square) => {};
 
     /**
      * On pawn promotion.
@@ -27,5 +27,12 @@ class ChessEvents {
      * @param peace object
      * @param square string
      */
-    onPawnPromotion = function (peace, square) {};
+    onPawnPromotion = (peace, square) => {};
+
+    /**
+     * On timout.
+     *
+     * @param side string
+     */
+    onTimeout = side => {};
 }
