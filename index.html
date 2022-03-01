@@ -21,25 +21,32 @@
 <script src="assets/js/functions.js"></script>
 <script src="assets/js/event.js"></script>
 <script src="assets/js/timer.js"></script>
-<script src="assets/js/king.js"></script>
-<script src="assets/js/queen.js"></script>
-<script src="assets/js/bishop.js"></script>
-<script src="assets/js/knight.js"></script>
-<script src="assets/js/rook.js"></script>
-<script src="assets/js/pawn.js"></script>
+<script src="assets/js/peaces/king.js"></script>
+<script src="assets/js/peaces/queen.js"></script>
+<script src="assets/js/peaces/bishop.js"></script>
+<script src="assets/js/peaces/knight.js"></script>
+<script src="assets/js/peaces/rook.js"></script>
+<script src="assets/js/peaces/pawn.js"></script>
 <script type="text/javascript">
     let chess = new Chess('board', 'white', true);
 
+    // draws the DOM board
     chess.createBoard();
 
+    // makes each peace active
+    chess.active();
+
+    // sets the timer
     chess.timer.set(60 * 3, 15);
 
-    chess.event.onCheckmate = peace => {
-        console.log(chess.side === peace.side ? 'You won' : 'You lost');
+    // on checkmate event
+    chess.event.onCheckmate = checkerPeace => {
+        console.log(chess.side === checkerPeace.side ? 'You won' : 'You lost');
     };
 
-    chess.event.onTimeout = side => {
-        console.log(side + ' won');
+    // on timout event
+    chess.event.onTimeout = winnerSide => {
+        console.log(winnerSide + ' won');
     }
 </script>
 </body>

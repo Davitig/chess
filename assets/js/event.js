@@ -24,15 +24,15 @@ class ChessEvent {
     /**
      * On pawn promotion.
      *
-     * @param peace object
-     * @param square string
+     * @param promPeace object
+     * @param promSquare string
      */
-    onPawnPromotion = (peace, square) => {};
+    onPawnPromotion = (promPeace, promSquare) => {};
 
     /**
      * On timout.
      *
-     * @param side string
+     * @param winnerSide string
      */
-    onTimeout = side => {};
+    onTimeout = winnerSide => {};
 }

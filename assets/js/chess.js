@@ -266,8 +266,6 @@ class Chess {
                 boardElement.appendChild(document.createElement('br'));
             }
         });
-
-        this.alive();
     }
 
     /**
@@ -313,9 +311,9 @@ class Chess {
     }
 
     /**
-     * Make each peace alive.
+     * Make each peace active.
      */
-    alive() {
+    active() {
         document.addEventListener('click', e => {
             const element = e.target;
 
