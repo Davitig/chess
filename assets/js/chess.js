@@ -241,7 +241,7 @@ class Chess {
 
         // create a timer element
         if (this.moveByOrder) {
-            boardElement.before(this.createTimerElement());
+            boardElement.before(this.timer.createTimerElement(this.side));
         }
 
         // create a captured peaces element
@@ -719,34 +719,6 @@ class Chess {
         pointElement.setAttribute('class', 'peaces point');
 
         sideDef === 'self' ? element.prepend(pointElement) : element.appendChild(pointElement);
-
-        return element;
-    }
-
-    /**
-     * Create a timer element.
-     *
-     * @return HTMLDivElement
-     */
-    createTimerElement() {
-        const element = document.createElement('div');
-        element.setAttribute('id', 'chess-timer');
-
-        const whiteTimerElement = document.createElement('div');
-        whiteTimerElement.setAttribute('id', 'white-timer')
-        whiteTimerElement.setAttribute('class', 'chess-timer')
-        whiteTimerElement.textContent = '00:00';
-
-        const blackTimerElement = document.createElement('div');
-        blackTimerElement.setAttribute('id', 'black-timer')
-        blackTimerElement.setAttribute('class', 'chess-timer')
-        blackTimerElement.textContent = '00:00';
-
-        element.appendChild(whiteTimerElement);
-
-        this.side === 'white'
-            ? whiteTimerElement.before(blackTimerElement)
-            : whiteTimerElement.after(blackTimerElement)
 
         return element;
     }

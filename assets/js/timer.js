@@ -23,6 +23,35 @@ class ChessTimer {
     durationIncrement = 0;
 
     /**
+     * Create a timer element.
+     *
+     * @param side string
+     * @return HTMLDivElement
+     */
+    createTimerElement(side) {
+        const element = document.createElement('div');
+        element.setAttribute('id', 'chess-timer');
+
+        const whiteTimerElement = document.createElement('div');
+        whiteTimerElement.setAttribute('id', 'white-timer')
+        whiteTimerElement.setAttribute('class', 'chess-timer')
+        whiteTimerElement.textContent = '00:00';
+
+        const blackTimerElement = document.createElement('div');
+        blackTimerElement.setAttribute('id', 'black-timer')
+        blackTimerElement.setAttribute('class', 'chess-timer')
+        blackTimerElement.textContent = '00:00';
+
+        element.appendChild(whiteTimerElement);
+
+        side === 'white'
+            ? whiteTimerElement.before(blackTimerElement)
+            : whiteTimerElement.after(blackTimerElement)
+
+        return element;
+    }
+
+    /**
      * Set the duration of the game, in milliseconds.
      *
      * @param duration number
