@@ -239,10 +239,12 @@ class Chess {
         const boardElement = document.getElementById(this.boardElementName);
         boardElement.setAttribute('class', this.side + ' clearfix');
 
-        // create captured peaces element
-        boardElement.before(this.createTimerElement());
+        // create a timer element
+        if (this.moveByOrder) {
+            boardElement.before(this.createTimerElement());
+        }
 
-        // create captured peaces element
+        // create a captured peaces element
         boardElement.before(this.createCapturedPeacesElement(
             this.side, 'opponent'
         ));
