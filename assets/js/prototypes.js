@@ -1,7 +1,7 @@
 /**
  * Pawn promotion peaces.
  *
- * @type object
+ * @type {object}
  */
 const pawnPromotion = {
     /**
@@ -32,7 +32,7 @@ const pawnPromotion = {
 /**
  * En passant container.
  *
- * @type object
+ * @type {object}
  */
 const enPassant = {
     /**

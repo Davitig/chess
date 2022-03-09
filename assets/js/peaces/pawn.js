@@ -2,21 +2,21 @@ class Pawn extends Peace {
     /**
      * String representation of the object.
      *
-     * @type string
+     * @type {string}
      */
-    name = "pawn"
+    name = 'pawn';
 
     /**
      * Point of the peace.
      *
-     * @type number
+     * @type {number}
      */
     point = 1;
 
     /**
      * The actual white peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     white = {
         file: 'w_pawn'
@@ -25,7 +25,7 @@ class Pawn extends Peace {
     /**
      * The actual black peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     black = {
         file: 'b_pawn'
@@ -41,7 +41,7 @@ class Pawn extends Peace {
     /**
      * Invoke on take square.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     onTakeSquare(chess) {
         // after the pawn move, run the king check action from every peace
@@ -68,10 +68,10 @@ class Pawn extends Peace {
     /**
      * Define squares for the peace.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef)
@@ -80,10 +80,10 @@ class Pawn extends Peace {
     /**
      * Get movable squares.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     getMovableSquares(chess, sort = false, fullDef = false) {
         let square = this.getSquare();
@@ -136,9 +136,9 @@ class Pawn extends Peace {
     /**
      * Get capture squares.
      *
-     * @param chess object
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} fullDef
+     * @return {array}
      */
     getCaptureSquares(chess, fullDef = false) {
         let squares = [];
@@ -194,10 +194,10 @@ class Pawn extends Peace {
     /**
      * Get a new key.
      *
-     * @param isIncrement boolean
-     * @param number integer
-     * @param key integer
-     * @return integer
+     * @param {boolean} isIncrement
+     * @param {number} number
+     * @param {number} key
+     * @return {number}
      */
     getNewKey(isIncrement, key, number) {
         return isIncrement ? key + number : key - number;
@@ -206,7 +206,7 @@ class Pawn extends Peace {
     /**
      * Take en passant peace.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     takesEnPassantPeace(chess) {
         if (! (this.enPassant.pawn instanceof Pawn)
@@ -231,7 +231,7 @@ class Pawn extends Peace {
     /**
      * Set self as en passant for another same peace.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     setsEnPassantPeace(chess) {
         let targetSquareNumber = chess.getSquareNumber(this.getSquare());
@@ -286,8 +286,8 @@ class Pawn extends Peace {
     /**
      * Create a promotion peaces element.
      *
-     * @param chess object
-     * @return HTMLDivElement
+     * @param {Chess} chess
+     * @return {HTMLDivElement}
      */
     createPromotionPeacesElement(chess) {
         const promElement = document.createElement('div');

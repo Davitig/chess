@@ -2,28 +2,28 @@ class King extends Peace {
     /**
      * String representation of the object.
      *
-     * @type string
+     * @type {string}
      */
-    name = "king"
+    name = 'king';
 
     /**
      * Point of the peace.
      *
-     * @type number
+     * @type {number}
      */
     point = 0;
 
     /**
      * Safe mode used to avoid correlation between kings during defining moves.
      *
-     * @type boolean
+     * @type {boolean}
      */
     safeMode = false;
 
     /**
      * The actual white peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     white = {
         file: 'w_king'
@@ -32,7 +32,7 @@ class King extends Peace {
     /**
      * The actual black peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     black = {
         file: 'b_king'
@@ -41,7 +41,7 @@ class King extends Peace {
     /**
      * Invoke on take square.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     onTakeSquare(chess) {
         // make the king check action
@@ -59,10 +59,10 @@ class King extends Peace {
     /**
      * Define squares for the peace.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getSafeSquares(
@@ -73,10 +73,10 @@ class King extends Peace {
     /**
      * Get movable squares.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     getMovableSquares(chess, sort = false, fullDef = false) {
         return defineDiagonalSquares(chess, 1, this.side, this.getSquare(), sort, fullDef).concat(
@@ -87,9 +87,9 @@ class King extends Peace {
     /**
      * Get safe squares.
      *
-     * @param chess squares
-     * @param squares array
-     * @return array
+     * @param {Chess} chess
+     * @param {array} squares
+     * @return {array}
      */
     getSafeSquares(chess, squares) {
         if (! this.safeMode) {

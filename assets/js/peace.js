@@ -1,23 +1,37 @@
 class Peace {
     /**
+     * String representation of the object.
+     *
+     * @type {string}
+     */
+    name;
+
+    /**
+     * Point of the peace.
+     *
+     * @type {number}
+     */
+    point = 0;
+
+    /**
      * Indicates whether the peace is white or black.
      *
-     * @type string
+     * @type {string}
      */
     side;
 
     /**
      * The current square.
      *
-     * @type string
+     * @type {string}
      */
     square;
 
     /**
      * Create a new bishop.
      *
-     * @param side string
-     * @param square string
+     * @param {string} side
+     * @param {string} square
      */
     constructor(side, square) {
         this.side = side;
@@ -28,7 +42,7 @@ class Peace {
     /**
      * Get the current square.
      *
-     * @return string
+     * @return {string}
      */
     getSquare() {
         return this.square;
@@ -37,7 +51,7 @@ class Peace {
     /**
      * Set the current square.
      *
-     * @return string
+     * @return {string}
      */
     setSquare(square) {
         return this.square = square;
@@ -46,7 +60,7 @@ class Peace {
     /**
      * Get the peace file.
      *
-     * @return string
+     * @return {string}
      */
     getFile() {
         return this[this.side].file;
@@ -55,17 +69,27 @@ class Peace {
     /**
      * Invoke on take square.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     onTakeSquare(chess) {}
 
     /**
+     * Define squares for the peace.
+     *
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
+     */
+    defineMoves(chess, sort = false, fullDef = false) {}
+
+    /**
      * Check.
      *
-     * @param chess object
-     * @param peaces array
-     * @param enableEvent boolean
-     * @return string
+     * @param {Chess} chess
+     * @param {array} peaces
+     * @param {boolean} enableEvent
+     * @return {array}
      */
     check(chess, peaces, enableEvent = true) {
         let availableSquares = [];
@@ -114,9 +138,9 @@ class Peace {
     /**
      * Make the king check actions on DOM.
      *
-     * @param chess object
-     * @param peaces array
-     * @return boolean
+     * @param {Chess} chess
+     * @param {array} peaces
+     * @return {boolean}
      */
     checkAction(chess, peaces) {
         let kingSquareElement = document.querySelector('[data-check="1"]');
@@ -128,7 +152,7 @@ class Peace {
         let checkerPeaces = this.check(chess, peaces);
 
         if (! checkerPeaces.length) {
-            return false;
+            return;
         }
 
         if (this.isCheckmate(chess, checkerPeaces)) {
@@ -147,9 +171,9 @@ class Peace {
     /**
      * Determine checkmate.
      *
-     * @param chess object
-     * @param checkerPeaces array
-     * @return boolean
+     * @param {Chess} chess
+     * @param {array} checkerPeaces
+     * @return {boolean}
      */
     isCheckmate(chess, checkerPeaces) {
         if (! checkerPeaces.length) {

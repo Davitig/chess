@@ -2,21 +2,21 @@ class Rook extends Peace {
     /**
      * String representation of the object.
      *
-     * @type string
+     * @type {string}
      */
-    name = "rook"
+    name = 'rook';
 
     /**
      * Point of the peace.
      *
-     * @type number
+     * @type {number}
      */
     point = 5;
 
     /**
      * The actual white peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     white = {
         file: 'w_rook'
@@ -25,7 +25,7 @@ class Rook extends Peace {
     /**
      * The actual black peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     black = {
         file: 'b_rook'
@@ -34,7 +34,7 @@ class Rook extends Peace {
     /**
      * Invoke on take square.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     onTakeSquare(chess) {
         // make the king check action
@@ -52,10 +52,10 @@ class Rook extends Peace {
     /**
      * Define squares for the peace.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef);
@@ -64,10 +64,10 @@ class Rook extends Peace {
     /**
      * Get movable squares.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     getMovableSquares(chess, sort = false, fullDef = false) {
         return defineLinearSquares(chess, 7, this.side, this.getSquare(), sort, fullDef);

@@ -1,13 +1,13 @@
 /**
  * Define diagonal squares.
  *
- * @param chess object
- * @param distance integer
- * @param side string
- * @param square string
- * @param sort boolean
- * @param fullDef boolean
- * @return array
+ * @param {Chess} chess
+ * @param {number} distance
+ * @param {string} side
+ * @param {string} square
+ * @param {boolean} sort
+ * @param {boolean} fullDef
+ * @return {array}
  */
 const defineDiagonalSquares = (chess, distance, side, square, sort = false, fullDef = false) => {
     let squares = chess.getSquares();
@@ -50,30 +50,8 @@ const defineDiagonalSquares = (chess, distance, side, square, sort = false, full
                     break;
                 }
 
-                if (sort) {
-                    newSquares[line].push(targetSquare);
-                } else {
-                    newSquares.push(targetSquare);
-                }
-
-                let targetPeace = chess.getPeace(targetSquare);
-
-                if (targetPeace instanceof Peace) {
-                    if (targetPeace.side === side) {
-                        // fullDef to protect the peace from the king
-                        if (! fullDefs[line]) {
-                            sort ? newSquares[line].pop() : newSquares.pop();
-                        } else {
-                            fullDefs[line] = false;
-                        }
-                    }
-
-                    // fullDef to continue checking squares through the king
-                    if (! fullDefs[line]
-                        && ! (targetPeace instanceof King && targetPeace.side !== side)
-                    ) {
-                        break;
-                    }
+                if (! sortSquaresByLine(newSquares, targetSquare, side, sort, line, fullDefs)) {
+                    break;
                 }
 
                 // if the target square reaches the board edge
@@ -90,13 +68,13 @@ const defineDiagonalSquares = (chess, distance, side, square, sort = false, full
 /**
  * Define linear squares.
  *
- * @param chess object
- * @param distance integer
- * @param side string
- * @param square string
- * @param sort boolean
- * @param fullDef boolean
- * @return array
+ * @param {Chess} chess
+ * @param {number} distance
+ * @param {string} side
+ * @param {string} square
+ * @param {boolean} sort
+ * @param {boolean} fullDef
+ * @return {array}
  */
 const defineLinearSquares = (chess, distance, side, square, sort = false, fullDef = false) => {
     let squares = chess.getSquares();
@@ -142,30 +120,8 @@ const defineLinearSquares = (chess, distance, side, square, sort = false, fullDe
                     break;
                 }
 
-                if (sort) {
-                    newSquares[line].push(targetSquare);
-                } else {
-                    newSquares.push(targetSquare);
-                }
-
-                let targetPeace = chess.getPeace(targetSquare);
-
-                if (targetPeace instanceof Peace) {
-                    if (targetPeace.side === side) {
-                        // fullDef to protect the peace from the king
-                        if (! fullDefs[line]) {
-                            sort ? newSquares[line].pop() : newSquares.pop();
-                        } else {
-                            fullDefs[line] = false
-                        }
-                    }
-
-                    // fullDef to continue checking squares through the king
-                    if (! fullDefs[line]
-                        && ! (targetPeace instanceof King && targetPeace.side !== side)
-                    ) {
-                        break;
-                    }
+                if (! sortSquaresByLine(newSquares, targetSquare, side, sort, line, fullDefs)) {
+                    break;
                 }
 
                 // if the target square reaches the board edge
@@ -182,11 +138,52 @@ const defineLinearSquares = (chess, distance, side, square, sort = false, fullDe
 }
 
 /**
+ * Sort squares by the lines.
+ *
+ * @param {array} squares
+ * @param {string} targetSquare
+ * @param {string} side
+ * @param {boolean} sort
+ * @param {number} line
+ * @param {boolean} fullDefs
+ * @return {boolean}
+ */
+function sortSquaresByLine(squares, targetSquare, side, sort, line, fullDefs) {
+    if (sort) {
+        squares[line].push(targetSquare);
+    } else {
+        squares.push(targetSquare);
+    }
+
+    let targetPeace = chess.getPeace(targetSquare);
+
+    if (targetPeace instanceof Peace) {
+        if (targetPeace.side === side) {
+            // fullDef to protect the peace from the king
+            if (! fullDefs[line]) {
+                sort ? squares[line].pop() : squares.pop();
+            } else {
+                fullDefs[line] = false
+            }
+        }
+
+        // fullDef to continue checking squares through the king
+        if (! fullDefs[line]
+            && ! (targetPeace instanceof King && targetPeace.side !== side)
+        ) {
+            return false;
+        }
+    }
+
+    return true
+}
+
+/**
  * Split the array into even chunks.
  *
- * @param array
- * @param size
- * @return array
+ * @param {array} array
+ * @param {number} size
+ * @return {array}
  */
 function arrayChunk(array, size) {
     const result = [];

@@ -2,37 +2,37 @@ class ChessEvent {
     /**
      * On checkmate.
      *
-     * @param checkerPeace object
+     * @param {Peace} checkerPeace
      */
     onCheckmate = checkerPeace => {}
 
     /**
      * On take square.
      *
-     * @param checkerPeaces array
+     * @param {array} checkerPeaces
      */
     onCheck = checkerPeaces => {};
 
     /**
      * On take square.
      *
-     * @param peace object|array
-     * @param square string
+     * @param {Peace|array} peace
+     * @param {string} square
      */
     onTakeSquare = (peace, square) => {};
 
     /**
      * On pawn promotion.
      *
-     * @param promPeace object
-     * @param promSquare string
+     * @param {Peace} promPeace
+     * @param {string} promSquare
      */
     onPawnPromotion = (promPeace, promSquare) => {};
 
     /**
      * On timout.
      *
-     * @param winnerSide string
+     * @param {string} winnerSide
      */
     onTimeout = winnerSide => {};
 }

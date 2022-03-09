@@ -3,7 +3,7 @@ class ChessTimer {
      * The active timer data of the white side.
      * Timer won't work if the move by order is disabled.
      *
-     * @type object
+     * @type {object}
      */
     white = {duration: 0, timerId: undefined};
 
@@ -11,22 +11,22 @@ class ChessTimer {
      * The active timer data of the black side.
      * Timer won't work if the move by order is disabled.
      *
-     * @type object
+     * @type {object}
      */
     black = {duration: 0, timerId: undefined};
 
     /**
      * Timer duration increment, in milliseconds.
      *
-     * @type number
+     * @type {number}
      */
     durationIncrement = 0;
 
     /**
      * Create a timer element.
      *
-     * @param side string
-     * @return HTMLDivElement
+     * @param {string} side
+     * @return {HTMLDivElement}
      */
     createTimerElement(side) {
         const element = document.createElement('div');
@@ -54,8 +54,8 @@ class ChessTimer {
     /**
      * Set the duration of the game, in milliseconds.
      *
-     * @param duration number
-     * @param increment number
+     * @param {number} duration
+     * @param {number} increment
      */
     set(duration, increment) {
         this.white.duration = duration;
@@ -73,8 +73,8 @@ class ChessTimer {
     /**
      * Start the timer.
      *
-     * @param chess Chess
-     * @param side string
+     * @param {Chess} chess
+     * @param {string} side
      */
     start(chess, side) {
         const element = document.getElementById(side + '-timer');
@@ -107,8 +107,8 @@ class ChessTimer {
     /**
      * Increment the duration.
      *
-     * @param side string
-     * @return boolean
+     * @param {string} side
+     * @return {boolean}
      */
     increment(side) {
         if (! this[side].timerId) {
@@ -129,8 +129,8 @@ class ChessTimer {
     /**
      * Stop the timer.
      *
-     * @param timerId setInterval ID
-     * @return function
+     * @param {number} timerId setInterval ID
+     * @return {function}
      */
     stopTimer(timerId) {
         return () => {
@@ -141,9 +141,9 @@ class ChessTimer {
     /**
      * Get a minutes from the duration time.
      *
-     * @param duration number
-     * @param appendZero boolean
-     * @return string
+     * @param {number} duration
+     * @param {boolean} appendZero
+     * @return {string}
      */
     getMinutes(duration, appendZero = true) {
         let minutes = parseInt(duration / 60, 10);
@@ -158,9 +158,9 @@ class ChessTimer {
     /**
      * Get a seconds from the duration time.
      *
-     * @param duration number
-     * @param appendZero boolean
-     * @return string
+     * @param {number} duration
+     * @param {boolean} appendZero
+     * @return {string}
      */
     getSeconds(duration, appendZero = true) {
         let minutes = parseInt(duration % 60, 10);

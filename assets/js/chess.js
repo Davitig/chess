@@ -2,7 +2,7 @@ class Chess {
     /**
      * Board DOM element name.
      *
-     * @type object
+     * @type string
      */
     boardElementName;
 
@@ -53,7 +53,7 @@ class Chess {
     /**
      * List of square names.
      *
-     * @type object
+     * @type array
      */
     squareKeys = [];
 
@@ -131,9 +131,9 @@ class Chess {
     /**
      * Create a new board.
      *
-     * @param name string
-     * @param side string
-     * @param moveByOrder boolean
+     * @param {string} name
+     * @param {string} side
+     * @param {boolean} moveByOrder
      */
     constructor(name, side, moveByOrder = true) {
         this.boardElementName = name;
@@ -152,7 +152,7 @@ class Chess {
     /**
      * Get the squares.
      *
-     * @return array
+     * @return {array}
      */
     getSquares() {
         return this.squareKeys;
@@ -161,8 +161,8 @@ class Chess {
     /**
      * Get the square.
      *
-     * @param key string
-     * @return array
+     * @param {string} key
+     * @return {array}
      */
     getSquare(key) {
         return this.squareKeys[key];
@@ -171,7 +171,7 @@ class Chess {
     /**
      * Get the active square.
      *
-     * @return array
+     * @return {array}
      */
     getActiveSquare() {
         return this.activeSquare;
@@ -180,7 +180,7 @@ class Chess {
     /**
      * Get the peaces from the squares.
      *
-     * @return array
+     * @return {array}
      */
     getPeaces() {
         return Object.values(this.squares);
@@ -189,8 +189,8 @@ class Chess {
     /**
      * Get the peace from the squares.
      *
-     * @param square string
-     * @return object
+     * @param {string} square
+     * @return {Peace|array}
      */
     getPeace(square) {
         return square ? this.squares[square] : this.getActivePeace();
@@ -199,7 +199,7 @@ class Chess {
     /**
      * Get the active peace from the squares.
      *
-     * @return object
+     * @return {Peace}
      */
     getActivePeace() {
         return this.squares[this.activeSquare];
@@ -208,8 +208,8 @@ class Chess {
     /**
      * Get peace file by order.
      *
-     * @param file string|object
-     * @return string
+     * @param {string|object} file
+     * @return {string}
      */
     getPeaceFileByOrder(file) {
         if (file.constructor === Object) {
@@ -273,9 +273,9 @@ class Chess {
     /**
      * Add peace into the square.
      *
-     * @param peace object
-     * @param square HTMLElement|string
-     * @return boolean
+     * @param {Peace|undefined} peace
+     * @param {HTMLDivElement|string} square
+     * @return {boolean}
      */
     addPeace(peace, square) {
         let squareElement = square;
@@ -334,8 +334,8 @@ class Chess {
     /**
      * On peace click.
      *
-     * @param squareElement object
-     * @return boolean
+     * @param {HTMLDivElement} squareElement
+     * @return {boolean}
      */
     onPeaceClick(squareElement) {
         // if peace square is available it's a capture
@@ -363,7 +363,7 @@ class Chess {
     /**
      * On available square click.
      *
-     * @param targetSquareElement object
+     * @param {HTMLDivElement} targetSquareElement
      */
     onAvailableSquareClick(targetSquareElement) {
         let targetSquare = targetSquareElement.getAttribute('data-square');
@@ -380,9 +380,9 @@ class Chess {
     /**
      * Take the square.
      *
-     * @param targetSquare string
-     * @param targetSquareElement object|undefined
-     * @return boolean
+     * @param {string} targetSquare
+     * @param {HTMLDivElement|undefined} targetSquareElement
+     * @return {boolean}
      */
     takeSquare(targetSquare, targetSquareElement) {
         let activePeace = this.getActivePeace();
@@ -423,18 +423,20 @@ class Chess {
     /**
      * On peace promotion click.
      *
-     * @param peaceElement object
+     * @param {HTMLDivElement} peaceElement
      */
     onPeacePromotion(peaceElement) {
+        let peaceParentElement = peaceElement.parentNode;
+
         let peaceName = peaceElement.getAttribute('data-prom-peace');
-        let promSquare = peaceElement.parentNode.getAttribute('data-prom-square');
+        let promSquare = peaceParentElement.getAttribute('data-prom-square');
 
         let peace = this.getPeace(promSquare);
 
         chess.addPeace(
             pawnPromotion.getPeaces(peace.side)[peaceName],
             document.querySelector(
-                '#' + peaceElement.parentNode.getAttribute('data-prom-square')
+                '#' + peaceParentElement.getAttribute('data-prom-square')
             )
         );
 
@@ -448,9 +450,9 @@ class Chess {
     /**
      * Set active square.
      *
-     * @param square string
-     * @param squareElement object
-     * @return boolean
+     * @param {string} square
+     * @param {HTMLDivElement} squareElement
+     * @return {boolean}
      */
     setActiveSquare(square, squareElement) {
         // if the move order is enabled and trying to activate a same side peace
@@ -482,7 +484,7 @@ class Chess {
     /**
      * Set available squares.
      *
-     * @return boolean
+     * @return {boolean}
      */
     setAvailableSquares() {
         let peace = this.getActivePeace();
@@ -526,7 +528,7 @@ class Chess {
     /**
      * If the king peace is on the check, defend it from another peaces
      *
-     * @return boolean
+     * @return {boolean}
      */
     intersectAvailableAndCheckerSquares() {
         let checkerPeaces = this.imitateCheck();
@@ -551,7 +553,7 @@ class Chess {
     /**
      * Imitate king check from every peace.
      *
-     * @return array
+     * @return {array}
      */
     imitateCheck() {
         let checkerPeaces = [];
@@ -588,10 +590,8 @@ class Chess {
 
     /**
      * Unset squares.
-     *
-     * @param element object
      */
-    unsetSquares(element) {
+    unsetSquares() {
         this.unsetActiveSquare();
         this.unsetAvailableSquares();
     }
@@ -661,9 +661,9 @@ class Chess {
     /**
      * Capture the peace element with an active one.
      *
-     * @param targetPeace object
-     * @param targetSquareElement object
-     * @param replaceWithActive boolean
+     * @param {Peace} targetPeace
+     * @param {HTMLDivElement} targetSquareElement
+     * @param {boolean} replaceWithActive
      */
     capturePeaceElement(targetPeace, targetSquareElement, replaceWithActive = true) {
         const targetPeaceElement = targetSquareElement.querySelector('.peace');
@@ -681,8 +681,8 @@ class Chess {
     /**
      * Collect the captured peace element.
      *
-     * @param peace Peace
-     * @param peaceElement object
+     * @param {Peace} peace
+     * @param {HTMLDivElement} peaceElement
      */
     collectCapturedPeaceElement(peace, peaceElement) {
         const capturedPeacesElement = document.querySelector(
@@ -695,9 +695,9 @@ class Chess {
     /**
      * Create a captured peaces element.
      *
-     * @param side string
-     * @param sideDef string
-     * @return HTMLDivElement
+     * @param {string} side
+     * @param {string} sideDef
+     * @return {HTMLDivElement}
      */
     createCapturedPeacesElement(side, sideDef) {
         const element = document.createElement('div');
@@ -726,7 +726,7 @@ class Chess {
     /**
      * Set visibility of the board background.
      *
-     * @param value integer
+     * @param {number} value
      */
     setBoardBgVisibility(value) {
         const chessBoardBg = document.getElementById('chessboard-bg');
@@ -738,8 +738,8 @@ class Chess {
     /**
      * Get alphabet from square.
      *
-     * @param square string
-     * @return string
+     * @param {string} square
+     * @return {string}
      */
     getSquareAlphabet(square) {
         if (square !== undefined) {
@@ -752,8 +752,8 @@ class Chess {
     /**
      * Get number from square.
      *
-     * @param square string
-     * @return integer
+     * @param {string} square
+     * @return {number}
      */
     getSquareNumber(square) {
         if (square !== undefined) {
@@ -766,9 +766,9 @@ class Chess {
     /**
      * Get array key from the squares.
      *
-     * @param square string
-     * @param squares array|undefined
-     * @return boolean|number
+     * @param {string} square
+     * @param {array|undefined} squares
+     * @return {boolean|undefined}
      */
     getSquaresArrayKey(square, squares = undefined) {
         if (square === undefined) {
@@ -785,6 +785,6 @@ class Chess {
             }
         }
 
-        return false;
+        return undefined;
     }
 }

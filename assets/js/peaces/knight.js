@@ -2,21 +2,21 @@ class Knight extends Peace {
     /**
      * String representation of the object.
      *
-     * @type string
+     * @type {string}
      */
-    name = "knight"
+    name = 'knight';
 
     /**
      * Point of the peace.
      *
-     * @type number
+     * @type {number}
      */
     point = 3;
 
     /**
      * The actual white peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     white = {
         file: {
@@ -28,7 +28,7 @@ class Knight extends Peace {
     /**
      * The actual black peace file (see assets -> images).
      *
-     * @type object
+     * @type {object}
      */
     black = {
         file: {
@@ -40,7 +40,7 @@ class Knight extends Peace {
     /**
      * Invoke on take square.
      *
-     * @param chess object
+     * @param {Chess} chess
      */
     onTakeSquare(chess) {
         // make the king check action
@@ -59,10 +59,10 @@ class Knight extends Peace {
     /**
      * Define squares for the peace.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef);
@@ -71,10 +71,10 @@ class Knight extends Peace {
     /**
      * Get movable squares.
      *
-     * @param chess object
-     * @param sort boolean
-     * @param fullDef boolean
-     * @return array
+     * @param {Chess} chess
+     * @param {boolean} sort
+     * @param {boolean} fullDef
+     * @return {array}
      */
     getMovableSquares(chess, sort = false, fullDef = false) {
         let squares = chess.getSquares();
@@ -107,9 +107,9 @@ class Knight extends Peace {
     /**
      * Get movable squares filter function.
      *
-     * @param square string
-     * @param fullDef boolean
-     * @return function
+     * @param {string} square
+     * @param {boolean} fullDef
+     * @return {function}
      */
     getMovableSquaresFilterFunction(square, fullDef = false) {
         let currentSquareAlphabet = chess.getSquareAlphabet(square);
