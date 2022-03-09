@@ -39,16 +39,13 @@ class King extends Peace {
     }
 
     /**
-     * Invoke on take square.
-     *
-     * @param {Chess} chess
+     * @inheritDoc
      */
     onTakeSquare(chess) {
         // make the king check action
         this.checkAction(chess, chess.getPeaces().filter(peace => {
             return peace instanceof Peace
                 && peace.side === this.side
-                && ! (peace instanceof King)
                 && (peace instanceof Queen
                     || peace instanceof Rook
                     || peace instanceof Bishop
@@ -57,12 +54,7 @@ class King extends Peace {
     }
 
     /**
-     * Define squares for the peace.
-     *
-     * @param {Chess} chess
-     * @param {boolean} sort
-     * @param {boolean} fullDef
-     * @return {array}
+     * @inheritDoc
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getSafeSquares(

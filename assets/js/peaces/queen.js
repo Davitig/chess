@@ -32,22 +32,22 @@ class Queen extends Peace {
     }
 
     /**
-     * Invoke on take square.
-     *
-     * @param {Chess} chess
+     * @inheritDoc
      */
-    onTakeSquare(chess) {
-        // make the king check action
-        this.checkAction(chess, this);
+    checkAction(chess, peaces) {
+        return super.checkAction(chess, this);
     }
 
     /**
-     * Define squares for the peace.
-     *
-     * @param {Chess} chess
-     * @param {boolean} sort
-     * @param {boolean} fullDef
-     * @return {array}
+     * @inheritDoc
+     */
+    onTakeSquare(chess) {
+        // make the king check action
+        this.checkAction(chess, []);
+    }
+
+    /**
+     * @inheritDoc
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef);

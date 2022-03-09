@@ -146,7 +146,7 @@ class Chess {
 
         this.event = new ChessEvent;
 
-        this.timer = new ChessTimer;
+        this.timer = new ChessTimer(this);
     }
 
     /**
@@ -335,19 +335,18 @@ class Chess {
      * On peace click.
      *
      * @param {HTMLDivElement} squareElement
-     * @return {boolean}
      */
     onPeaceClick(squareElement) {
         // if peace square is available it's a capture
         if (squareElement.getAttribute('data-available') === '1') {
             // if the king square is on check: do not take it
             if (squareElement.getAttribute('data-check') === '1') {
-                return true;
+                return;
             }
 
             this.onAvailableSquareClick(squareElement);
 
-            return true;
+            return;
         }
 
         let square = squareElement.getAttribute('data-square');
@@ -356,8 +355,6 @@ class Chess {
         if (this.setActiveSquare(square, squareElement)) {
             this.setAvailableSquares();
         }
-
-        return true;
     }
 
     /**
@@ -399,15 +396,15 @@ class Chess {
 
         if (this.moveByOrder) {
             if (activePeace.side === 'white') {
-                this.timer.start(this, 'black');
+                this.timer.start('black', this.event);
             } else {
-                this.timer.start(this, 'white');
+                this.timer.start('white', this.event);
             }
         }
 
         this.prevSideMove = activePeace.side;
 
-        chess.event.onTakeSquare(targetPeace, targetSquare);
+        this.event.onTakeSquare(targetPeace, targetSquare);
 
         activePeace.onTakeSquare(this);
 
@@ -432,17 +429,20 @@ class Chess {
         let promSquare = peaceParentElement.getAttribute('data-prom-square');
 
         let peace = this.getPeace(promSquare);
+        let promPeace = pawnPromotion.getPeaces(peace.side)[peaceName];
 
-        chess.addPeace(
-            pawnPromotion.getPeaces(peace.side)[peaceName],
+        this.addPeace(
+            promPeace,
             document.querySelector(
                 '#' + peaceParentElement.getAttribute('data-prom-square')
             )
         );
 
+        promPeace.checkAction(this, []);
+
         this.setBoardBgVisibility(0)
 
-        chess.event.onPawnPromotion(peace, promSquare);
+        this.event.onPawnPromotion(peace, promSquare);
 
         document.getElementById('promotion').remove();
     }
@@ -772,7 +772,7 @@ class Chess {
      */
     getSquaresArrayKey(square, squares = undefined) {
         if (square === undefined) {
-            square = chess.activeSquare;
+            square = this.getActiveSquare();
         }
 
         if (squares === undefined) {

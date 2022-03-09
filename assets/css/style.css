@@ -3,8 +3,7 @@ html, body {margin: 0; padding: 0;}
 #chessboard-bg[data-visible="0"] {display: none;}
 #chessboard-bg {width: 100%; height: 100%; z-index: 1; position: absolute; top: 0; left: 0; background-color: #77777780;}
 .container {width: 720px; margin: 5px auto 20px;}
-#chess {position: relative;}
-#chess-timer {position: absolute; top: 46%; left: -100px;}
+#chess-timer {width: 80px; height: 60px; position: absolute; top: 46%; left: 0;}
 #chess-timer .chess-timer {padding: 5px 10px;}
 #chess-timer .chess-timer:nth-child(1) {border-bottom: 1px solid gray;}
 .white .square:nth-child(even) {background-color: #deb887;}

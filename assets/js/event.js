@@ -10,8 +10,9 @@ class ChessEvent {
      * On take square.
      *
      * @param {array} checkerPeaces
+     * @param {string} side
      */
-    onCheck = checkerPeaces => {};
+    onCheck = (checkerPeaces, side) => {};
 
     /**
      * On take square.

@@ -39,18 +39,19 @@ class Pawn extends Peace {
     enPassant = {pawn: undefined, activeSquare: undefined, captureSquare: undefined};
 
     /**
-     * Invoke on take square.
-     *
-     * @param {Chess} chess
+     * @inheritDoc
      */
     onTakeSquare(chess) {
         // after the pawn move, run the king check action from every peace
-        this.checkAction(chess, chess.getPeaces().filter(peace => {
-            return peace instanceof Peace
-                && peace.side === this.side
-                && ! (peace instanceof King)
-                || Object.is(this, peace)
-        }));
+        if (! [2, 7].includes(chess.getSquareNumber())) {
+            this.checkAction(chess, chess.getPeaces().filter(peace => {
+                return peace instanceof Peace
+                    && peace.side === this.side
+                    && ! (peace instanceof King)
+                    && ! (peace instanceof Pawn)
+                    || Object.is(this, peace)
+            }));
+        }
 
         // take or set en passant peace if its available
         if (! this.takesEnPassantPeace(chess)) {
@@ -66,12 +67,7 @@ class Pawn extends Peace {
     }
 
     /**
-     * Define squares for the peace.
-     *
-     * @param {Chess} chess
-     * @param {boolean} sort
-     * @param {boolean} fullDef
-     * @return {array}
+     * @inheritDoc
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef)
@@ -328,6 +324,7 @@ class Pawn extends Peace {
 
         promElement.style.top = psRect.top + 'px';
         promElement.style.left = psRect.left + 'px';
+        console.log(psRect);
 
         if (chess.side !== this.side) {
             promElement.style.top = (psRect.bottom - promElement.clientHeight) + 'px';

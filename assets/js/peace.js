@@ -84,14 +84,46 @@ class Peace {
     defineMoves(chess, sort = false, fullDef = false) {}
 
     /**
+     * Make the king check actions on DOM.
+     *
+     * @param {Chess} chess
+     * @param {array} peaces
+     * @return {boolean}
+     */
+    checkAction(chess, peaces) {
+        let kingSquareElement = document.querySelector('[data-check="1"]');
+
+        if (kingSquareElement) {
+            kingSquareElement.setAttribute('data-check', 0);
+        }
+
+        let checkerPeaces = this.check(chess, peaces);
+
+        if (! checkerPeaces.length) {
+            return;
+        }
+
+        if (this.isCheckmate(chess, checkerPeaces)) {
+            chess.event.onCheckmate(this);
+        }
+
+        kingSquareElement = document.getElementById(checkerPeaces[0].kingSquare);
+
+        if (kingSquareElement) {
+            kingSquareElement.setAttribute('data-check', 1);
+        }
+
+        return true;
+    }
+
+    /**
      * Check.
      *
      * @param {Chess} chess
      * @param {array} peaces
-     * @param {boolean} enableEvent
      * @return {array}
      */
-    check(chess, peaces, enableEvent = true) {
+    check(chess, peaces) {
         let availableSquares = [];
         let peacesList = [];
         let checkerPeaces = [];
@@ -128,44 +160,11 @@ class Peace {
             });
         }
 
-        if (enableEvent && checkerPeaces.length) {
-            chess.event.onCheck(checkerPeaces);
+        if (checkerPeaces.length) {
+            chess.event.onCheck(checkerPeaces, checkerPeaces[0].checkerPeace.side);
         }
 
         return checkerPeaces;
-    }
-
-    /**
-     * Make the king check actions on DOM.
-     *
-     * @param {Chess} chess
-     * @param {array} peaces
-     * @return {boolean}
-     */
-    checkAction(chess, peaces) {
-        let kingSquareElement = document.querySelector('[data-check="1"]');
-
-        if (kingSquareElement) {
-            kingSquareElement.setAttribute('data-check', 0);
-        }
-
-        let checkerPeaces = this.check(chess, peaces);
-
-        if (! checkerPeaces.length) {
-            return;
-        }
-
-        if (this.isCheckmate(chess, checkerPeaces)) {
-            chess.event.onCheckmate(this);
-        }
-
-        kingSquareElement = document.getElementById(checkerPeaces[0].kingSquare);
-
-        if (kingSquareElement) {
-            kingSquareElement.setAttribute('data-check', 1);
-        }
-
-        return true;
     }
 
     /**

@@ -1,5 +1,12 @@
 class ChessTimer {
     /**
+     * The chess instance.
+     *
+     * @type {Chess}
+     */
+    chess;
+
+    /**
      * The active timer data of the white side.
      * Timer won't work if the move by order is disabled.
      *
@@ -21,6 +28,15 @@ class ChessTimer {
      * @type {number}
      */
     durationIncrement = 0;
+
+    /**
+     * Create a new timer instance.
+     *
+     * @param {Chess} chess
+     */
+    constructor(chess) {
+        this.chess = chess;
+    }
 
     /**
      * Create a timer element.
@@ -65,18 +81,20 @@ class ChessTimer {
 
         const whiteTimerElement = document.getElementById('white-timer');
         const blackTimerElement = document.getElementById('black-timer');
+        // let psRect = document.getElementById().getBoundingClientRect();
 
-        whiteTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
-        blackTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+        if (whiteTimerElement && blackTimerElement) {
+            whiteTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+            blackTimerElement.textContent = this.getMinutes(duration) + ':' + this.getSeconds(duration);
+        }
     }
 
     /**
      * Start the timer.
      *
-     * @param {Chess} chess
      * @param {string} side
      */
-    start(chess, side) {
+    start(side) {
         const element = document.getElementById(side + '-timer');
 
         let oppositeSide = (side === 'white' ? 'black' : 'white');
@@ -91,7 +109,7 @@ class ChessTimer {
             if (--duration < 0) {
                 stopTimer();
 
-                chess.event.onTimeout(oppositeSide);
+                this.chess.event.onTimeout(oppositeSide);
             }
         }, 1000);
 

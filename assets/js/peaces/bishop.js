@@ -32,30 +32,31 @@ class Bishop extends Peace {
     }
 
     /**
-     * Invoke on take square.
-     *
-     * @param {Chess} chess
+     * @inheritDoc
      */
-    onTakeSquare(chess) {
-        // make the king check action
-        this.checkAction(chess, chess.getPeaces().filter(peace => {
+    checkAction(chess, peaces) {
+        peaces = peaces.length ? peaces : chess.getPeaces().filter(peace => {
             return peace instanceof Peace
                 && peace.side === this.side
-                && ! (peace instanceof King)
                 && (peace instanceof Queen
                     || peace instanceof Rook
                     || Object.is(this, peace)
                 )
-        }));
+        });
+
+        return super.checkAction(chess, peaces);
     }
 
     /**
-     * Define squares for the peace.
-     *
-     * @param {Chess} chess
-     * @param {boolean} sort
-     * @param {boolean} fullDef
-     * @return {array}
+     * @inheritDoc
+     */
+    onTakeSquare(chess) {
+        // make the king check action
+        this.checkAction(chess, []);
+    }
+
+    /**
+     * @inheritDoc
      */
     defineMoves(chess, sort = false, fullDef = false) {
         return this.getMovableSquares(chess, sort, fullDef);

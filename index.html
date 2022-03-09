@@ -39,6 +39,11 @@
     // sets the timer
     chess.timer.set(60 * 3, 15);
 
+    // on check event
+    chess.event.onCheck = (checkerPeaces, side) => {
+        console.log('Checked by ' + side);
+    };
+
     // on checkmate event
     chess.event.onCheckmate = checkerPeace => {
         console.log(chess.side === checkerPeace.side ? 'You won' : 'You lost');
