@@ -1,2 +1,2 @@
 # Chess
-Description will follow...
+Simply for fun. No real use case yet.
